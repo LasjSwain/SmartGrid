@@ -6,6 +6,7 @@ import pandas as pd
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 # GENERAL CLASS COMMENT:
 # registry part is necessary to easily loop over all instances of the object later
@@ -35,10 +36,10 @@ class Battery:
 class Cable:
     _registry = []
 
-    def __init__(self, x, y):
+    def __init__(self, x_coords, y_coords):
         self._registry.append(self)
-        self.x = x
-        self.y = y
+        self.x_coords = x_coords
+        self.y_coords = y_coords
 
 # load in the locations of the houses and batteries as provided
 def load_district(dis_id):
@@ -59,11 +60,45 @@ def load_district(dis_id):
 
     return
 
+def make_cable():
+
+    for hou in House._registry:
+
+        cable_instance = [[hou.x, hou.y]]
+        for idx in range(3): 
+            # THIS STEP DOESNT WORK YET: ALLOWS DIAGONAL WALKING NOW
+            # maybe later make a separate function that decides where to go
+            # which takes into account borders, battery-endpoints
+            # should be easier to later implement an actual algorithm as well
+
+            # random step of one grid segment
+            dx = random.randint(-1, 1)
+            dy = random.randint(-1, 1)
+
+            # make sure diagonal movement is illegal
+            while dx**2 + dy**2 != 1:
+                dx = random.randint(-1, 1)
+                dy = random.randint(-1, 1)
+
+            # calc coords of new cable point
+            cable_point = [cable_instance[idx][0] + dx, cable_instance[idx][1] + dy]
+            cable_instance.append(cable_point)
+
+        # this can be done easier i know sry
+        cable_instance = np.array(cable_instance)
+        cable_instance = cable_instance.T
+
+        cable = Cable(cable_instance[0], cable_instance[1])
+        
+    return
+
 # draw a basic visualisation of the provided elements
 def draw_grid():
 
     bat_coords = [[], []]
     hou_coords = [[], []]
+    # prob diff structure, line instead of point
+    cab_coords = [[], []]
 
     # gather coords of all object instances and format in scatterable way
     for hou in House._registry:
@@ -79,9 +114,14 @@ def draw_grid():
     ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
 
     # just draw a random line to see how it looks
-    x = [0, 1, 2, 3, 4, 5]
-    y = [0, 0, 0, 0, 0, 0]
-    ax.plot(x, y, c='green')
+    # x = [0, 1, 2, 3, 4, 5]
+    # y = [0, 0, 0, 0, 0, 0]
+    # ax.plot(x, y, c='green')
+
+    # plot the semi random lines
+    for cab in Cable._registry:
+        ax.plot(cab.x_coords, cab.y_coords, c='green')
+
 
     # some nice ticks and grid etc
     ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5), 
@@ -95,4 +135,5 @@ def draw_grid():
     return
 
 load_district(2)
+make_cable()
 draw_grid()
