@@ -20,6 +20,7 @@ class House(object):
         self.x = x
         self.y = y
         self.maxoutput = maxoutput
+        self.connected = False
 
 # a class that represents a Battery object
 class Battery:
@@ -65,24 +66,102 @@ def make_cable():
     for hou in House._registry:
 
         cable_instance = [[hou.x, hou.y]]
-        for idx in range(3): 
-            # THIS STEP DOESNT WORK YET: ALLOWS DIAGONAL WALKING NOW
-            # maybe later make a separate function that decides where to go
-            # which takes into account borders, battery-endpoints
-            # should be easier to later implement an actual algorithm as well
+        for idx in range(100): 
 
-            # random step of one grid segment
-            dx = random.randint(-1, 1)
-            dy = random.randint(-1, 1)
+            # checks if cable from house reached battery already
+                if hou.connected == False:
 
-            # make sure diagonal movement is illegal
-            while dx**2 + dy**2 != 1:
-                dx = random.randint(-1, 1)
-                dy = random.randint(-1, 1)
+                    # making sure cables dont run outside of the grid
+                    if cable_instance[-1][0] == 50 and cable_instance[-1][1] == 50:
+                        # random step of one grid segment, but not in positive x direction
+                        dx = random.randint(-1, 0)
+                        dy = random.randint(-1, 0)
 
-            # calc coords of new cable point
-            cable_point = [cable_instance[idx][0] + dx, cable_instance[idx][1] + dy]
-            cable_instance.append(cable_point)
+                        while dx**2 + dy**2 != 1:
+                            dx = random.randint(-1, 0)
+                            dy = random.randint(-1, 0)
+                    
+                    elif cable_instance[-1][0] == 0 and cable_instance[-1][1] == 0:
+                        # random step of one grid segment, but not in positive x direction
+                        dx = random.randint(0, 1)
+                        dy = random.randint(0, 1)
+
+                        while dx**2 + dy**2 != 1:
+                            dx = random.randint(0, 1)
+                            dy = random.randint(0, 1)
+                    
+                    elif cable_instance[-1][0] == 50 and cable_instance[-1][1] == 0:
+                        # random step of one grid segment, but not in positive x direction
+                        dx = random.randint(-1, 0)
+                        dy = random.randint(0, 1)
+
+                        while dx**2 + dy**2 != 1:
+                            dx = random.randint(-1, 0)
+                            dy = random.randint(0, 1)
+
+                    elif cable_instance[-1][0] == 0 and cable_instance[-1][1] == 50:
+                        # random step of one grid segment, but not in positive x direction
+                        dx = random.randint(0, 1)
+                        dy = random.randint(-1, 0)
+
+                        while dx**2 + dy**2 != 1:
+                            dx = random.randint(0, 1)
+                            dy = random.randint(-1, 0)
+
+                    elif cable_instance[-1][0] == 50:
+                        # random step of one grid segment, but not in positive x direction
+                        dx = random.randint(-1, 0)
+                        dy = random.randint(-1, 1)
+
+                        while dx**2 + dy**2 != 1:
+                            dx = random.randint(-1, 0)
+                            dy = random.randint(-1, 1)
+
+                    elif cable_instance[-1][0] == 0:
+                        # random step of one grid segment, but not in negative x direction
+                        dx = random.randint(0, 1)
+                        dy = random.randint(-1, 1)
+
+                        while dx**2 + dy**2 != 1:
+                            dx = random.randint(0, 1)
+                            dy = random.randint(-1, 1)
+
+                    elif cable_instance[-1][1] == 50:
+                        # random step of one grid segment but not in positive y direction
+                        dx = random.randint(-1, 1)
+                        dy = random.randint(-1, 0)
+
+                        while dx**2 + dy**2 != 1:
+                            dx = random.randint(-1, 1)
+                            dy = random.randint(-1, 0)
+                    
+                    elif cable_instance[-1][1] == 0:
+                        # random step of one grid segment, but not in negative y direction
+                        dx = random.randint(-1, 1)
+                        dy = random.randint(0, 1)
+
+                        while dx**2 + dy**2 != 1:
+                            dx = random.randint(-1, 1)
+                            dy = random.randint(0, 1)
+                    
+                    else:
+                        # random step of one grid segment
+                        dx = random.randint(-1, 1)
+                        dy = random.randint(-1, 1)
+
+                        # make sure diagonal movement is illegal
+                        while dx**2 + dy**2 != 1:
+                            dx = random.randint(-1, 1)
+                            dy = random.randint(-1, 1)
+
+                    # calc coords of new cable point
+                    cable_point = [cable_instance[idx][0] + dx, cable_instance[idx][1] + dy]
+                    cable_instance.append(cable_point)
+                    
+                    # checks if cable reached a battery and updates house registry if reached
+                    for battery in Battery._registry:
+                        if battery.x == cable_point[0] and battery.y == cable_point[1]:
+                            hou.connected = True
 
         # this can be done easier i know sry
         cable_instance = np.array(cable_instance)
