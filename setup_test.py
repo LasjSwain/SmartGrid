@@ -73,7 +73,7 @@ def make_cable():
 
                     # making sure cables dont run outside of the grid
                     if cable_instance[-1][0] == 50 and cable_instance[-1][1] == 50:
-                        # random step of one grid segment, but not in positive x direction
+                        # random step of one grid segment, but not in positive x or y direction
                         dx = random.randint(-1, 0)
                         dy = random.randint(-1, 0)
 
@@ -82,7 +82,7 @@ def make_cable():
                             dy = random.randint(-1, 0)
                     
                     elif cable_instance[-1][0] == 0 and cable_instance[-1][1] == 0:
-                        # random step of one grid segment, but not in positive x direction
+                        # random step of one grid segment, but not in negative x or y direction
                         dx = random.randint(0, 1)
                         dy = random.randint(0, 1)
 
@@ -91,7 +91,7 @@ def make_cable():
                             dy = random.randint(0, 1)
                     
                     elif cable_instance[-1][0] == 50 and cable_instance[-1][1] == 0:
-                        # random step of one grid segment, but not in positive x direction
+                        # random step of one grid segment, but not in positive x or negative y direction
                         dx = random.randint(-1, 0)
                         dy = random.randint(0, 1)
 
@@ -100,7 +100,7 @@ def make_cable():
                             dy = random.randint(0, 1)
 
                     elif cable_instance[-1][0] == 0 and cable_instance[-1][1] == 50:
-                        # random step of one grid segment, but not in positive x direction
+                        # random step of one grid segment, but not in negative x or negative y direction
                         dx = random.randint(0, 1)
                         dy = random.randint(-1, 0)
 
