@@ -168,7 +168,7 @@ def new_cable_segment(cable_instance):
 # run a cable from a house to a battery (random)
 def make_cable(sorted_house_objects):
 
-    temp_count = 0
+    houses_connected = 0
     bat_full_list = []
     for hou in sorted_house_objects:
 
@@ -189,12 +189,13 @@ def make_cable(sorted_house_objects):
                 if bat.x == cable_point[0] and bat.y == cable_point[1]:
                     if bat.av_cap >= hou.maxoutput:
                         hou.connected = True
-                        temp_count += 1
+                        houses_connected += 1
                         bat.av_cap -= hou.maxoutput
                     else:
+                        # THIS DOESNT WORK YET: IF THIS HOUSE DOESNT FIT IT DOESNT MEAN THE BATTERY IS FULL!
                         if bat not in bat_full_list:
                             bat_full_list.append(bat)
-                        # print("{}, {}is full".format(bat.x, bat.y))
+
                     if len(bat_full_list) == 5:
                         print("alles is vol :(")
                         sys.exit()
@@ -206,9 +207,10 @@ def make_cable(sorted_house_objects):
             cable_instance.append(cable_point)
             cable_len += 1
 
-        print("{} houses connected".format(temp_count))
+        print("{} houses connected".format(houses_connected))
 
         # this can be done easier i know sry
+        # transpose the cable list from (xyxyxyxy) to (xxxyyy)
         cable_instance = (np.array(cable_instance)).T
 
         cable = Cable(cable_instance[0], cable_instance[1], cable_len)
