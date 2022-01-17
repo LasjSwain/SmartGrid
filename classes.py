@@ -1,4 +1,8 @@
-# GENERAL CLASS COMMENT:
+# tsja: an attempt to a SmartGrid solution
+# Dirk Kuiper (12416657) & Lars Zwaan (12414069)
+# part of Programmeertheorie, Minor Programmeren, UvA
+# classes defines the different classes we have, used in the other files
+
 # registry part is necessary to easily loop over all instances of the object later
 
 # a class that represents a House object
@@ -24,7 +28,6 @@ class Battery:
         self.av_cap = capacity
 
 # a class that represents a Cable object
-# havent done anything with this yet
 class Cable:
     _registry = []
 

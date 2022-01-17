@@ -1,14 +1,11 @@
 # tsja: an attempt to a SmartGrid solution
-# Dirk Kuiper () & Lars Zwaan (12414069)
+# Dirk Kuiper (12416657) & Lars Zwaan (12414069)
 # part of Programmeertheorie, Minor Programmeren, UvA
+# output draws a visual representation and produces a .json
 
-# draw the thingy and output json
-
-import pandas as pd
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-import random
 
 from classes import House, Battery, Cable
 
