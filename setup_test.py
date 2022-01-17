@@ -11,40 +11,38 @@ import random
 # GENERAL CLASS COMMENT:
 # registry part is necessary to easily loop over all instances of the object later
 
-from classes import House, Battery, Cable
+# a class that represents a House object
+class House(object):
+    _registry = []
 
-# # a class that represents a House object
-# class House(object):
-#     _registry = []
+    def __init__(self, x, y, maxoutput):
+        self._registry.append(self)
+        self.x = x
+        self.y = y
+        self.maxoutput = maxoutput
+        self.connected = False
 
-#     def __init__(self, x, y, maxoutput):
-#         self._registry.append(self)
-#         self.x = x
-#         self.y = y
-#         self.maxoutput = maxoutput
-#         self.connected = False
+# a class that represents a Battery object
+class Battery:
+    _registry = []
 
-# # a class that represents a Battery object
-# class Battery:
-#     _registry = []
+    def __init__(self, x, y, capacity):
+        self._registry.append(self)
+        self.x = x
+        self.y = y
+        self.capacity = capacity
+        self.av_cap = capacity
 
-#     def __init__(self, x, y, capacity):
-#         self._registry.append(self)
-#         self.x = x
-#         self.y = y
-#         self.capacity = capacity
-#         self.av_cap = capacity
+# a class that represents a Cable object
+# havent done anything with this yet
+class Cable:
+    _registry = []
 
-# # a class that represents a Cable object
-# # havent done anything with this yet
-# class Cable:
-#     _registry = []
-
-#     def __init__(self, x_coords, y_coords, length):
-#         self._registry.append(self)
-#         self.x_coords = x_coords
-#         self.y_coords = y_coords
-#         self.length = length
+    def __init__(self, x_coords, y_coords, length):
+        self._registry.append(self)
+        self.x_coords = x_coords
+        self.y_coords = y_coords
+        self.length = length
 
 # load in the locations of the houses and batteries as provided
 def load_district(dis_id):
@@ -147,9 +145,4 @@ def make_cable(sorted_house_objects, bitmap):
 
 sorted_house_objects, bitmap = load_district(1)
 make_cable(sorted_house_objects, bitmap)
-
-from output import draw_grid, make_json
-draw_grid()
-make_json()
-
 

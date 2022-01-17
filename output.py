@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
+from classes import House, Battery, Cable
+
 # draw a basic visualisation of the provided elements
 def draw_grid():
 
@@ -46,4 +48,8 @@ def draw_grid():
 
     plt.show()
 
+    return
+
+def make_json():
+    print("wie is jason dan?")
     return
