@@ -63,6 +63,11 @@ def load_district(dis_id):
 
     sorted_house_objects = sorted([hou for hou in House._registry], key=lambda x: x.maxoutput, reverse=True)
 
+    # creates bitmap for grid to checks for edges
+    bitmap = np.pad([[1 for x in range(51)] for y in range(51)], pad_width=1)
+    
+
+
     # tot_out = 0
     # for hou in House._registry:
     #     tot_out += hou.maxoutput 
@@ -72,101 +77,22 @@ def load_district(dis_id):
     #     tot_cap += bat.capacity 
     # print("total cap", tot_cap)
 
-    return sorted_house_objects
+    return sorted_house_objects, bitmap
 
-# check if the new point of the cable is allowed
+# creates a new cable segment in random direction
 def new_cable_segment(cable_instance):
-    
-    # if bitmap[cable_instance[-1][0]][cable_instance[-1][1]] == False:
-    #     ga terug
+    dx = random.randint(-1, 1)
+    dy = random.randint(-1, 1)
 
-    # making sure cables dont run outside of the grid
-    if cable_instance[-1][0] == 50 and cable_instance[-1][1] == 50:
-        # random step of one grid segment, but not in positive x or y direction
-        dx = random.randint(-1, 0)
-        dy = random.randint(-1, 0)
-
-        while dx**2 + dy**2 != 1:
-            dx = random.randint(-1, 0)
-            dy = random.randint(-1, 0)
-    
-    elif cable_instance[-1][0] == 0 and cable_instance[-1][1] == 0:
-        # random step of one grid segment, but not in negative x or y direction
-        dx = random.randint(0, 1)
-        dy = random.randint(0, 1)
-
-        while dx**2 + dy**2 != 1:
-            dx = random.randint(0, 1)
-            dy = random.randint(0, 1)
-    
-    elif cable_instance[-1][0] == 50 and cable_instance[-1][1] == 0:
-        # random step of one grid segment, but not in positive x or negative y direction
-        dx = random.randint(-1, 0)
-        dy = random.randint(0, 1)
-
-        while dx**2 + dy**2 != 1:
-            dx = random.randint(-1, 0)
-            dy = random.randint(0, 1)
-
-    elif cable_instance[-1][0] == 0 and cable_instance[-1][1] == 50:
-        # random step of one grid segment, but not in negative x or negative y direction
-        dx = random.randint(0, 1)
-        dy = random.randint(-1, 0)
-
-        while dx**2 + dy**2 != 1:
-            dx = random.randint(0, 1)
-            dy = random.randint(-1, 0)
-
-    elif cable_instance[-1][0] == 50:
-        # random step of one grid segment, but not in positive x direction
-        dx = random.randint(-1, 0)
-        dy = random.randint(-1, 1)
-
-        while dx**2 + dy**2 != 1:
-            dx = random.randint(-1, 0)
-            dy = random.randint(-1, 1)
-
-    elif cable_instance[-1][0] == 0:
-        # random step of one grid segment, but not in negative x direction
-        dx = random.randint(0, 1)
-        dy = random.randint(-1, 1)
-
-        while dx**2 + dy**2 != 1:
-            dx = random.randint(0, 1)
-            dy = random.randint(-1, 1)
-
-    elif cable_instance[-1][1] == 50:
-        # random step of one grid segment but not in positive y direction
-        dx = random.randint(-1, 1)
-        dy = random.randint(-1, 0)
-
-        while dx**2 + dy**2 != 1:
-            dx = random.randint(-1, 1)
-            dy = random.randint(-1, 0)
-    
-    elif cable_instance[-1][1] == 0:
-        # random step of one grid segment, but not in negative y direction
-        dx = random.randint(-1, 1)
-        dy = random.randint(0, 1)
-
-        while dx**2 + dy**2 != 1:
-            dx = random.randint(-1, 1)
-            dy = random.randint(0, 1)
-    
-    else:
-        # random step of one grid segment
+    # make sure diagonal movement is illegal
+    while dx**2 + dy**2 != 1:
         dx = random.randint(-1, 1)
         dy = random.randint(-1, 1)
-
-        # make sure diagonal movement is illegal
-        while dx**2 + dy**2 != 1:
-            dx = random.randint(-1, 1)
-            dy = random.randint(-1, 1)
 
     return dx, dy
 
 # run a cable from a house to a battery (random)
-def make_cable(sorted_house_objects):
+def make_cable(sorted_house_objects, bitmap):
 
     houses_connected = 0
     bat_full_list = []
@@ -184,28 +110,28 @@ def make_cable(sorted_house_objects):
             # calc coords of new cable point
             cable_point = [cable_instance[cable_len][0] + dx, cable_instance[cable_len][1] + dy]
 
-            # checks if cable reached an available battery
-            for bat in Battery._registry:
-                if bat.x == cable_point[0] and bat.y == cable_point[1]:
-                    if bat.av_cap >= hou.maxoutput:
-                        hou.connected = True
-                        houses_connected += 1
-                        bat.av_cap -= hou.maxoutput
-                    else:
-                        # THIS DOESNT WORK YET: IF THIS HOUSE DOESNT FIT IT DOESNT MEAN THE BATTERY IS FULL!
-                        if bat not in bat_full_list:
-                            bat_full_list.append(bat)
+            # checks on bitmap if the coordinate is valid (not outside of edges)
+            if bitmap[cable_point[0]+1][cable_point[1]+1] == 1:
 
-                    if len(bat_full_list) == 5:
-                        print("alles is vol :(")
-                        sys.exit()
+                # checks if cable reached an available battery
+                for bat in Battery._registry:
+                    if bat.x == cable_point[0] and bat.y == cable_point[1]:
+                        if bat.av_cap >= hou.maxoutput:
+                            hou.connected = True
+                            houses_connected += 1
+                            bat.av_cap -= hou.maxoutput
+                        else:
+                            # THIS DOESNT WORK YET: IF THIS HOUSE DOESNT FIT IT DOESNT MEAN THE BATTERY IS FULL!
+                            if bat not in bat_full_list:
+                                bat_full_list.append(bat)
 
-            # THIS PROCESS JUST MAKES IT TRY A NEW RANDOM OPTION IF IT REACHES
-            # A FULL BATTERY -> WE COULD IMPLEMENT SOMETHING THAT MAKES IT TURN
-            # BUT I GUESS WE WANT IT AS DUMB AS POSSIBLE RN
-            
-            cable_instance.append(cable_point)
-            cable_len += 1
+                        if len(bat_full_list) == 5:
+                            print("alles is vol :(")
+                            sys.exit()
+
+                cable_instance.append(cable_point)
+                cable_len += 1
+            # elses: try again
 
         print("{} houses connected".format(houses_connected))
 
@@ -255,6 +181,6 @@ def draw_grid():
 
     return
 
-sorted_house_objects = load_district(1)
-make_cable(sorted_house_objects)
+sorted_house_objects, bitmap = load_district(1)
+make_cable(sorted_house_objects, bitmap)
 draw_grid()
