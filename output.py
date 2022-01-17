@@ -45,8 +45,13 @@ def draw_grid():
 
     plt.show()
 
-    return
+    return total_cable_len
 
-def make_json():
-    print("wie is jason dan?")
+def make_json(DISTRICT, total_cable_len):
+    battery_price = 5000
+    cable_price = 9
+    number_batteries = 5
+    own_costs = number_batteries * battery_price + total_cable_len * cable_price
+    print("District:", DISTRICT)
+    print("own-costs:", own_costs)
     return

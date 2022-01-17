@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
+DISTRICT = 1
+
 # GENERAL CLASS COMMENT:
 # registry part is necessary to easily loop over all instances of the object later
 
@@ -39,13 +41,13 @@ def load_district(dis_id):
     return sorted_house_objects, bitmap  
 
 
-sorted_house_objects, bitmap = load_district(1)
+sorted_house_objects, bitmap = load_district(DISTRICT)
 
 from algo_random import make_cable
 make_cable(sorted_house_objects, bitmap)
 
 from output import draw_grid, make_json
-draw_grid()
-make_json()
+total_cable_len = draw_grid()
+make_json(DISTRICT, total_cable_len)
 
 
