@@ -6,15 +6,16 @@
 # registry part is necessary to easily loop over all instances of the object later
 
 # a class that represents a House object
-class House(object):
+class House():
     _registry = []
 
-    def __init__(self, x, y, maxoutput):
+    def __init__(self, x, y, maxoutput, cable):
         self._registry.append(self)
         self.x = x
         self.y = y
         self.maxoutput = maxoutput
         self.connected = False
+        self.cable = cable
 
 # a class that represents a Battery object
 class Battery:
@@ -26,6 +27,7 @@ class Battery:
         self.y = y
         self.capacity = capacity
         self.av_cap = capacity
+        self.connected_to = []
 
 # a class that represents a Cable object
 class Cable:

@@ -31,7 +31,7 @@ def load_district(dis_id):
     for idx, hou in df_hou.iterrows():
         # comma separated string -> list of [x, y] ints
         coord_pair = [int(hou['x']), int(hou['y'])]
-        house = House(coord_pair[0], coord_pair[1], hou['maxoutput'])
+        house = House(coord_pair[0], coord_pair[1], hou['maxoutput'], 'here will be a cable')
 
     sorted_house_objects = sorted([hou for hou in House._registry], key=lambda x: x.maxoutput, reverse=True)
 

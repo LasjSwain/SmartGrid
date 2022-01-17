@@ -6,6 +6,7 @@
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
+import json
 
 from classes import House, Battery, Cable
 
@@ -30,9 +31,19 @@ def draw_grid():
 
     # plot the semi random lines
     total_cable_len = 0
+    done = False
+    first_circled = False
     for cab in Cable._registry:
-        ax.plot(cab.x_coords, cab.y_coords, c='green')
         total_cable_len += cab.length
+        # ax.plot(cab.x_coords, cab.y_coords, c='green')
+
+        # plot only one to see more
+        if not done:
+            ax.plot(cab.x_coords, cab.y_coords, c='green')
+            if not first_circled:
+                ax.scatter(cab.x_coords[0], cab.y_coords[0], s=100, facecolors='none', edgecolors='fuchsia')
+                first_circled = True
+            done = True
 
     ax.set_title("Total cable length: {}".format(total_cable_len))
 
@@ -47,11 +58,55 @@ def draw_grid():
 
     return total_cable_len
 
+# output a json file in the specified format to use check50
 def make_json(DISTRICT, total_cable_len):
+    # some constants that might differ later
     battery_price = 5000
     cable_price = 9
     number_batteries = 5
-    own_costs = number_batteries * battery_price + total_cable_len * cable_price
-    print("District:", DISTRICT)
-    print("own-costs:", own_costs)
+    costs_own = number_batteries * battery_price + total_cable_len * cable_price
+
+    # create a dict that will be outputted to jason, made of several subdicts
+    output_dict = dict()
+
+    # a subdict for general info
+    general_dict = dict()
+    general_dict["costs-own"] = costs_own
+    general_dict["district"] = DISTRICT
+
+    output_dict[0] = general_dict
+
+    # a subdict for each battery
+    for idx_bat, bat in enumerate(Battery._registry):
+        bat_dict = dict()
+        bat_dict["location"] = "{},{}".format(bat.x, bat.y)
+        bat_dict["capacity"] = bat.capacity
+
+        all_hou_dict = dict()
+        # a subdict for each house
+        for idx_hou, hou in enumerate(bat.connected_to):
+            hou_dict = dict()
+
+            hou_dict["location"] = "{},{}".format(hou.x, hou.y)
+            hou_dict["output"] = hou.maxoutput
+
+            cable_dict = dict()
+
+            # at each cable segment coordinate as a line to the cable dict
+            for cable_idx in range(hou.cable.length):
+                x = hou.cable.x_coords[cable_idx]
+                y = hou.cable.y_coords[cable_idx]
+                cable_dict[cable_idx] = "{},{}".format(x, y)
+
+            hou_dict["cables"] = cable_dict
+            all_hou_dict[idx_hou] = hou_dict
+
+        bat_dict["houses"] = all_hou_dict
+
+        # idx + 1 because general is already at [0]
+        output_dict[idx_bat + 1] = bat_dict
+
+    with open('output/output.json', 'w') as fp:
+        json.dump(output_dict, fp)
+
     return

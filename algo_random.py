@@ -50,6 +50,7 @@ def make_cable(sorted_house_objects, bitmap):
                             hou.connected = True
                             houses_connected += 1
                             bat.av_cap -= hou.maxoutput
+                            bat.connected_to.append(hou)
                         else:
                             if bat not in bat_full_list:
                                 bat_full_list.append(bat)
@@ -64,11 +65,15 @@ def make_cable(sorted_house_objects, bitmap):
                 cable_len += 1
             # elses: try again
 
-        print("{} houses connected".format(houses_connected))
+        # dont print the whole time cause that shit is annoying
+        if houses_connected % 10 == 0:
+            print("{} houses connected".format(houses_connected))
 
-        # transpose the cable list from (xyxyxyxy) to (xxxyyy)
+        # transpose the cable list from ([xy][xy]) to ([xxx][yyy])
         cable_instance = (np.array(cable_instance)).T
 
         cable = Cable(cable_instance[0], cable_instance[1], cable_len)
+        
+        hou.cable = cable
         
     return
