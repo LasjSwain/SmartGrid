@@ -34,7 +34,7 @@ def draw_grid():
     done = False
     first_circled = False
     for cab in Cable._registry:
-        total_cable_len += cab.length
+        total_cable_len += cab.length + 1
         # ax.plot(cab.x_coords, cab.y_coords, c='green')
 
         # plot only one to see more
@@ -66,47 +66,46 @@ def make_json(DISTRICT, total_cable_len):
     number_batteries = 5
     costs_own = number_batteries * battery_price + total_cable_len * cable_price
 
-    # create a dict that will be outputted to jason, made of several subdicts
-    output_dict = dict()
+    # create a list that will be outputted to jason, made of dicts
+    output = []
 
     # a subdict for general info
     general_dict = dict()
     general_dict["costs-own"] = costs_own
     general_dict["district"] = DISTRICT
 
-    output_dict[0] = general_dict
+    output.append(general_dict)
 
     # a subdict for each battery
-    for idx_bat, bat in enumerate(Battery._registry):
+    for bat in Battery._registry:
         bat_dict = dict()
         bat_dict["location"] = "{},{}".format(bat.x, bat.y)
         bat_dict["capacity"] = bat.capacity
 
-        all_hou_dict = dict()
+        all_hou_list = []
         # a subdict for each house
-        for idx_hou, hou in enumerate(bat.connected_to):
+        for hou in bat.connected_to:
             hou_dict = dict()
 
             hou_dict["location"] = "{},{}".format(hou.x, hou.y)
             hou_dict["output"] = hou.maxoutput
 
-            cable_dict = dict()
+            cable_list = []
 
             # at each cable segment coordinate as a line to the cable dict
-            for cable_idx in range(hou.cable.length):
+            # + 1 for number of points inst of len, + 1 for arriving at last point
+            for cable_idx in range(hou.cable.length + 1):
                 x = hou.cable.x_coords[cable_idx]
                 y = hou.cable.y_coords[cable_idx]
-                cable_dict[cable_idx] = "{},{}".format(x, y)
+                cable_list.append("{},{}".format(x, y))
 
-            hou_dict["cables"] = cable_dict
-            all_hou_dict[idx_hou] = hou_dict
+            hou_dict["cables"] = cable_list
+            all_hou_list.append(hou_dict)
 
-        bat_dict["houses"] = all_hou_dict
-
-        # idx + 1 because general is already at [0]
-        output_dict[idx_bat + 1] = bat_dict
+        bat_dict["houses"] = all_hou_list
+        output.append(bat_dict)
 
     with open('output/output.json', 'w') as fp:
-        json.dump(output_dict, fp)
+        json.dump(output, fp)
 
     return
