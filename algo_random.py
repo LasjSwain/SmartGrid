@@ -75,5 +75,6 @@ def make_cable(sorted_house_objects, bitmap):
         cable = Cable(cable_instance[0], cable_instance[1], cable_len)
         
         hou.cable = cable
+        bat.cables.append(cable)
         
     return

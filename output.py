@@ -30,11 +30,19 @@ def draw_grid():
     ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
 
     # plot the semi random lines
-    total_cable_len = 0
+    cable_len_own = 0
+    counted_cab_points = []
     done = False
     first_circled = False
     for cab in Cable._registry:
-        total_cable_len += cab.length + 1
+        cable_len_own += cab.length + 1
+
+        # if a cable point is at a previously empty point, count it
+        for idx in range(len(cab.x_coords)):
+            cab_point = [cab.x_coords[idx], cab.y_coords[idx]]
+            if cab_point not in counted_cab_points:
+                counted_cab_points.append(cab_point)
+
         # ax.plot(cab.x_coords, cab.y_coords, c='green')
 
         # plot only one to see more
@@ -45,7 +53,8 @@ def draw_grid():
                 first_circled = True
             done = True
 
-    ax.set_title("Total cable length: {}".format(total_cable_len))
+    cable_len_shared = len(counted_cab_points)
+    ax.set_title("Cable length own vs shared: {} vs {}".format(cable_len_own, cable_len_shared))
 
     # some nice ticks and grid etc
     ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5), 
@@ -56,15 +65,15 @@ def draw_grid():
 
     plt.show()
 
-    return total_cable_len
+    return cable_len_own
 
 # output a json file in the specified format to use check50
-def make_json(DISTRICT, total_cable_len):
+def make_json(DISTRICT, cable_len_own):
     # some constants that might differ later
     battery_price = 5000
     cable_price = 9
     number_batteries = 5
-    costs_own = number_batteries * battery_price + total_cable_len * cable_price
+    costs_own = number_batteries * battery_price + cable_len_own * cable_price
 
     # create a list that will be outputted to jason, made of dicts
     output = []

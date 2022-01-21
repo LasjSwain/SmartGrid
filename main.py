@@ -43,6 +43,7 @@ def load_district(dis_id):
 
 sorted_house_objects, bitmap = load_district(DISTRICT)
 
+# pick an algorithm by changing "algo_..."
 from algo_random import make_cable
 make_cable(sorted_house_objects, bitmap)
 

@@ -32,13 +32,16 @@ def make_cable(sorted_house_objects, bitmap):
     bat_full_list = []
     for hou in sorted_house_objects:
 
-        closest_bat = ''
+        closest_connectpoint = ''
         min_distance = 100
         for bat in Battery._registry:
             if bat not in bat_full_list:
-                if manhattan_distance([hou.x, hou.y], [bat.x, bat.y]) < min_distance:
-                    min_distance = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
-                    closest_bat = bat
+                for cable in bat.cables:
+                    for idx in range(len(cable.x_coords)):
+                        cab_point = [cable.x_coords[idx], cable.y_coords[idx]]
+                        if manhattan_distance([hou.x, hou.y], cab_point) < min_distance:
+                            min_distance = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
+                            closest_connectpoint = cab_point
 
 
 

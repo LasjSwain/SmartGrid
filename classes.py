@@ -28,6 +28,7 @@ class Battery:
         self.capacity = capacity
         self.av_cap = capacity
         self.connected_to = []
+        self.cables = []
 
 # a class that represents a Cable object
 class Cable:
