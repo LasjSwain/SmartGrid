@@ -31,23 +31,31 @@ def make_cable(sorted_house_objects, bitmap):
     houses_connected = 0
     bat_full_list = []
     for hou in sorted_house_objects:
-
+        
+        bat_to_cnct = ''
         closest_connectpoint = ''
         min_distance = 100
         for bat in Battery._registry:
             if bat not in bat_full_list:
-                for cable in bat.cables:
-                    for idx in range(len(cable.x_coords)):
-                        cab_point = [cable.x_coords[idx], cable.y_coords[idx]]
-                        if manhattan_distance([hou.x, hou.y], cab_point) < min_distance:
-                            min_distance = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
-                            closest_connectpoint = cab_point
+                if bat.cables == False:
+                    for cable in bat.cables:
+                        for idx in range(len(cable.x_coords)):
+                            cab_point = [cable.x_coords[idx], cable.y_coords[idx]]
+                            if manhattan_distance([hou.x, hou.y], cab_point) < min_distance:
+                                min_distance = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
+                                closest_connectpoint = cab_point
+                                bat_to_cnct = bat
+                else:
+                    if manhattan_distance([hou.x, hou.y], [bat.x, bat.y]) < min_distance:
+                        min_distance = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
+                        closest_connectpoint = [bat.x, bat.y]
+                        bat_to_cnct = bat
 
 
 
         cable_instance = [[hou.x, hou.y]]
         cable_len = 0
-        distance_to_bat = manhattan_distance([hou.x, hou.y], [closest_bat.x, closest_bat.y])
+        distance_to_cnctpoint = manhattan_distance([hou.x, hou.y], closest_connectpoint)
 
         # while cable from house hasnt reached battery
         while hou.connected == False:
@@ -61,39 +69,49 @@ def make_cable(sorted_house_objects, bitmap):
             # checks on bitmap if the coordinate is valid (not outside of edges)
             if bitmap[cable_point[0]+1][cable_point[1]+1] == 1:
 
-                if manhattan_distance(cable_point, [closest_bat.x, closest_bat.y]) < distance_to_bat:
+                if manhattan_distance(cable_point, closest_connectpoint) < distance_to_cnctpoint:
 
 
                     # checks if cable reached an available battery
-                    for bat in Battery._registry:
-                        if bat.x == cable_point[0] and bat.y == cable_point[1]:
-                            if bat.av_cap >= hou.maxoutput:
-                                hou.connected = True
-                                houses_connected += 1
-                                bat.av_cap -= hou.maxoutput
-                                bat.connected_to.append(hou)
-                            else:
-                                if bat not in bat_full_list:
-                                    bat_full_list.append(bat)
-                                    min_distance = 100
-                                    for bat in Battery._registry:
-                                        if bat not in bat_full_list:
+                    if closest_connectpoint[0] == cable_point[0] and closest_connectpoint[1] == cable_point[1]:
+                        if bat_to_cnct.av_cap >= hou.maxoutput:
+                            hou.connected = True
+                            houses_connected += 1
+                            bat_to_cnct.av_cap -= hou.maxoutput
+                            # TO DO: loop through houses and check if any house fits.
+                            bat_to_cnct.connected_to.append(hou)
+                        else:
+                            if bat_to_cnct not in bat_full_list:
+                                bat_full_list.append(bat_to_cnct)
+                                min_distance = 100
+                                for bat in Battery._registry:
+                                    if bat not in bat_full_list:
+                                        if bat.cables == False:
+                                            for cable in bat.cables:
+                                                for idx in range(len(cable.x_coords)):
+                                                    cab_point = [cable.x_coords[idx], cable.y_coords[idx]]
+                                                    if manhattan_distance([hou.x, hou.y], cab_point) < min_distance:
+                                                        min_distance = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
+                                                        closest_connectpoint = cab_point
+                                                        bat_to_cnct = bat
+                                        else:
                                             if manhattan_distance([hou.x, hou.y], [bat.x, bat.y]) < min_distance:
                                                 min_distance = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
-                                                closest_bat = bat
+                                                closest_connectpoint = [bat.x, bat.y]
+                                                bat_to_cnct = bat
 
-                            if len(bat_full_list) == 5:
-                                print("alles is vol :(")
-                                print("maar we gaan gewoon lekker door")
-                                # this is bad but i wanna print it without trying endlessly
-                                # hou.connected = True
+                        if len(bat_full_list) == 5:
+                            print("alles is vol :(")
+                            print("maar we gaan gewoon lekker door")
+                            # this is bad but i wanna print it without trying endlessly
+                            # hou.connected = True
 
-                                # just return the function so i can see the end result
-                                return
+                            # just return the function so i can see the end result
+                            return
 
                     cable_instance.append(cable_point)
                     cable_len += 1
-                    distance_to_bat = manhattan_distance(cable_point, [closest_bat.x, closest_bat.y])
+                    distance_to_cnctpoint = manhattan_distance(cable_point, [closest_connectpoint[0], closest_connectpoint[1]])
             # else: try again
 
         # dont print the whole time cause that shit is annoying
