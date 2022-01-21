@@ -57,9 +57,8 @@ def make_cable(sorted_house_objects, bitmap):
 
                         if len(bat_full_list) == 5:
                             print("alles is vol :(")
-                            print("maar we gaan gewoon lekker door")
-                            # this is bad but i wanna print it without trying endlessly
-                            hou.connected = True
+                            print("return False and try again")
+                            return False
 
                 cable_instance.append(cable_point)
                 cable_len += 1
@@ -77,4 +76,4 @@ def make_cable(sorted_house_objects, bitmap):
         hou.cable = cable
         bat.cables.append(cable)
         
-    return
+    return True

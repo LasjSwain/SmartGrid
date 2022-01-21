@@ -43,15 +43,15 @@ def draw_grid():
             if cab_point not in counted_cab_points:
                 counted_cab_points.append(cab_point)
 
-        # ax.plot(cab.x_coords, cab.y_coords, c='green')
+        ax.plot(cab.x_coords, cab.y_coords, c='green')
 
         # plot only one to see more
-        if not done:
-            ax.plot(cab.x_coords, cab.y_coords, c='green')
-            if not first_circled:
-                ax.scatter(cab.x_coords[0], cab.y_coords[0], s=100, facecolors='none', edgecolors='fuchsia')
-                first_circled = True
-            done = True
+        # if not done:
+        #     ax.plot(cab.x_coords, cab.y_coords, c='green')
+        #     if not first_circled:
+        #         ax.scatter(cab.x_coords[0], cab.y_coords[0], s=100, facecolors='none', edgecolors='fuchsia')
+        #         first_circled = True
+        #     done = True
 
     cable_len_shared = len(counted_cab_points)
     ax.set_title("Cable length own vs shared: {} vs {}".format(cable_len_own, cable_len_shared))
