@@ -72,12 +72,21 @@ def make_cable(sorted_house_objects, bitmap):
                             else:
                                 if bat not in bat_full_list:
                                     bat_full_list.append(bat)
+                                    min_distance = 100
+                                    for bat in Battery._registry:
+                                        if bat not in bat_full_list:
+                                            if manhattan_distance([hou.x, hou.y], [bat.x, bat.y]) < min_distance:
+                                                min_distance = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
+                                                closest_bat = bat
 
                             if len(bat_full_list) == 5:
                                 print("alles is vol :(")
                                 print("maar we gaan gewoon lekker door")
                                 # this is bad but i wanna print it without trying endlessly
-                                hou.connected = True
+                                # hou.connected = True
+
+                                # just return the function so i can see the end result
+                                return
 
                     cable_instance.append(cable_point)
                     cable_len += 1
