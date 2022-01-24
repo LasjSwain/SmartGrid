@@ -55,7 +55,7 @@ sorted_house_objects, bitmap = load_district(DISTRICT)
 #     sorted_house_objects, bitmap = load_district(DISTRICT)
 #     legal_solution = make_cable(sorted_house_objects, bitmap)
 
-from algo_astar import make_cable
+from algorithms.algo_astar import make_cable
 legal_solution = False
 attempts = 0
 while not legal_solution:
