@@ -66,8 +66,6 @@ make_cable(combi_dict, bitmap)
 from output import draw_grid, make_json
 total_cable_len = draw_grid()
 
-print("etst")
-
 make_json(DISTRICT, total_cable_len)
 
 
