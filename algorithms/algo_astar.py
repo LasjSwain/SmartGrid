@@ -34,7 +34,7 @@ def make_cable(combi_dict, bitmap):
         hou.connected = False
 
     for bat in combi_dict:
-        print("bat {},{} is connected to {} houses".format(bat.x, bat.y, len(bat.connected_to)))
+        # print("bat {},{} is connected to {} houses".format(bat.x, bat.y, len(bat.connected_to)))
         for hou in bat.connected_to:
         
             closest_connectpoint = ''
@@ -89,6 +89,7 @@ def make_cable(combi_dict, bitmap):
             cable_instance = (np.array(cable_instance)).T
 
             cable = Cable(cable_instance[0], cable_instance[1], cable_len)
+            print(cable.length)
             
             hou.cable = cable
             bat.cables.append(cable)

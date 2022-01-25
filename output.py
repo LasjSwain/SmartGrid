@@ -10,8 +10,109 @@ import json
 
 from classes import House, Battery, Cable
 
-# draw a basic visualisation of the provided elements
-def draw_grid():
+def find_cable_length():
+
+    cable_length = 0
+
+    for cab in Cable._registry:
+        cable_length += cab.length
+
+    return cable_length
+
+# draw a visualisation of the grid, repeated for each battery network
+def draw_rep_plot():
+
+    bat_coords = [[], []]
+    for bat in Battery._registry:
+        bat_coords[0].append(bat.x)
+        bat_coords[1].append(bat.y)
+    
+    # gather coords of all object instances and format in scatterable way
+    for bat in Battery._registry:
+        fig, ax = plt.subplots()
+
+        hou_coords = [[], []]
+        total_cable_len = 0
+
+        for hou in House._registry:
+            hou_coords[0].append(hou.x)
+            hou_coords[1].append(hou.y)
+
+        ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
+        ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
+
+        cable_len_bat = 0
+
+        for cab in bat.cables:
+            ax.plot(cab.x_coords, cab.y_coords, c='green')
+            cable_len_bat += cab.length
+
+        total_cable_len += cable_len_bat
+
+        # some nice ticks and grid etc
+        ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5), 
+        ylim=(-5, 55), yticks=np.arange(0, 51, 5))
+        ax.minorticks_on()
+        ax.grid(which='both')
+
+        ax.set_title("total shared cable length: {}".format(total_cable_len))
+
+        plt.show()
+
+    return
+
+# draw a visualisation of the grid, each battery networks in a subplot
+def draw_sub_plot():
+
+    fig, ax = plt.subplots()
+
+    bat_coords = [[], []]
+    hou_coords = [[], []]
+    total_cable_len = 0
+    
+    # gather coords of all object instances and format in scatterable way
+    x_plot = 0
+    y_plot = 0
+    for bat in Battery._registry:
+        bat_coords[0].append(bat.x)
+        bat_coords[1].append(bat.y)
+
+        for hou in bat.connected_to:
+            hou_coords[0].append(hou.x)
+            hou_coords[1].append(hou.y)
+
+        ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
+        ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
+
+        cable_len_bat = 0
+
+        for cab in bat.cables:
+            ax.plot(cab.x_coords, cab.y_coords, c='green')
+            cable_len_bat += cab.length
+
+        total_cable_len += cable_len_bat
+
+        # some nice ticks and grid etc
+        ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5), 
+        ylim=(-5, 55), yticks=np.arange(0, 51, 5))
+        ax.minorticks_on()
+        ax.grid(which='both')
+
+        x_plot += 1
+        if x_plot == 3:
+            y_plot += 1
+            x_plot = 0
+
+    fig.suptitle("total shared cable length: {}".format(total_cable_len))
+
+    plt.show()
+
+    return
+
+# draw a visualisation of the grid, all battery networks in 1 plot
+def draw_all_plot():
+
+    fig, ax = plt.subplots()
 
     bat_coords = [[], []]
     hou_coords = [[], []]
@@ -25,28 +126,15 @@ def draw_grid():
         bat_coords[0].append(bat.x)
         bat_coords[1].append(bat.y)
 
-    fig, ax = plt.subplots()
     ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
     ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
 
-    # plot the semi random lines
-    cable_len_own = 0
-    counted_cab_points = []
-    done = False
-    first_circled = False
+    total_cable_len = 0
     for cab in Cable._registry:
-        cable_len_own += cab.length + 1
-
-        # if a cable point is at a previously empty point, count it
-        for idx in range(len(cab.x_coords)):
-            cab_point = [cab.x_coords[idx], cab.y_coords[idx]]
-            if cab_point not in counted_cab_points:
-                counted_cab_points.append(cab_point)
-
         ax.plot(cab.x_coords, cab.y_coords, c='green')
+        total_cable_len += cab.length
 
-    cable_len_shared = len(counted_cab_points)
-    ax.set_title("Cable length own vs shared: {} vs {}".format(cable_len_own, cable_len_shared))
+    ax.set_title("total shared cable length: {}".format(total_cable_len))
 
     # some nice ticks and grid etc
     ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5), 
@@ -57,7 +145,7 @@ def draw_grid():
 
     plt.show()
 
-    return cable_len_own
+    return
 
 # output a json file in the specified format to use check50
 def make_json(DISTRICT, cable_len_own):
