@@ -43,38 +43,28 @@ def load_district(dis_id):
 
 sorted_house_objects, bitmap = load_district(DISTRICT)
 
-# pick an algorithm by changing "algo_..."
-# from algo_random import make_cable
-# legal_solution = False
-# while not legal_solution:
-#     # empty classes
-#     Battery._registry = []
-#     House._registry = []
-#     Cable._registry = []
-        
-#     sorted_house_objects, bitmap = load_district(DISTRICT)
-#     legal_solution = make_cable(sorted_house_objects, bitmap)
 
-from algorithms.algo_astar import make_cable
+from algorithms.algo_combi import find_random_combi
+
 legal_solution = False
-attempts = 0
+attempt = 0
 while not legal_solution:
-    print("attempts ", attempts)
-    # empty classes
+    attempt += 1
+    print("Attempt to configure {}".format(attempt))
     Battery._registry = []
     House._registry = []
     Cable._registry = []
-        
     sorted_house_objects, bitmap = load_district(DISTRICT)
-    legal_solution = make_cable(sorted_house_objects, bitmap)
-    random.shuffle(sorted_house_objects)
+    legal_solution, combi_dict = find_random_combi(sorted_house_objects)
 
-    attempts += 1
+print("COMBINATION FOUND!")
 
-    if attempts == 1:
-        from output import draw_grid, make_json
-        total_cable_len = draw_grid()
-        sys.exit()
+from algorithms.algo_astar import make_cable
+
+make_cable(combi_dict, bitmap)
+
+from output import draw_grid, make_json
+total_cable_len = draw_grid()
 
 make_json(DISTRICT, total_cable_len)
 

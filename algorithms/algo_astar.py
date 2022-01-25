@@ -27,107 +27,70 @@ def new_cable_segment():
     return dx, dy
 
 # run a cable from a house to a battery (random)
-def make_cable(sorted_house_objects, bitmap):
+def make_cable(combi_dict, bitmap):
 
-    # del later
-    hou_count = 0
+    # reset all houses to not connected to re-use this variable
+    for hou in House._registry:
+        hou.connected = False
 
-    bat_full_list = []
-    for hou in sorted_house_objects:
+    for bat in combi_dict:
+        print("bat {},{} is connected to {} houses".format(bat.x, bat.y, len(bat.connected_to)))
+        for hou in bat.connected_to:
         
-        bat_to_cnct = ''
-        closest_connectpoint = ''
+            closest_connectpoint = ''
 
-        # set a initial value of the max distance possible
-        min_distance = 100
+            # find the nearest connectable point to this battery
+            # if bat has no cables, closest connectable point = bat self
+            if len(bat.cables) == 0:
+                closest_connectpoint = [bat.x, bat.y]
 
-        # find the nearest connectable point to a battery
-        for bat in Battery._registry:
-            if bat not in bat_full_list:
+            # else find closest cable connected to that battery
+            else:
+                # a (high) start value for min distance
+                min_distance = 100      
+                for cable in bat.cables:
+                    for idx in range(len(cable.x_coords)):
+                        cab_point = [cable.x_coords[idx], cable.y_coords[idx]]
+                        if manhattan_distance([hou.x, hou.y], cab_point) < min_distance:
+                            min_distance = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
+                            closest_connectpoint = cab_point
 
-                # if bat has no cables, closest connectable point = bat self
-                if len(bat.cables) == 0:
-                    if manhattan_distance([hou.x, hou.y], [bat.x, bat.y]) < min_distance:
-                        min_distance = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
-                        closest_connectpoint = [bat.x, bat.y]
-                        bat_to_cnct = bat
-                # else find closest cable connected to that battery
-                else:                   
-                    for cable in bat.cables:
-                        for idx in range(len(cable.x_coords)):
-                            cab_point = [cable.x_coords[idx], cable.y_coords[idx]]
-                            if manhattan_distance([hou.x, hou.y], cab_point) < min_distance:
-                                min_distance = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
-                                closest_connectpoint = cab_point
-                                bat_to_cnct = bat
+            # start building the cable at the house
+            cable_instance = [[hou.x, hou.y]]
+            cable_len = 0
+            distance_to_cnctpoint = manhattan_distance([hou.x, hou.y], closest_connectpoint)
 
-        cable_instance = [[hou.x, hou.y]]
-        cable_len = 0
-        distance_to_cnctpoint = manhattan_distance([hou.x, hou.y], closest_connectpoint)
+            # while cable from house hasnt reached battery
+            while hou.connected == False:
 
-        # print("house is at: {}, {}".format(hou.x, hou.y))
-        # print("closest bat is at: {}, {}".format(bat_to_cnct.x, bat_to_cnct.y))
-        # print("closest connectpoint is at: {}".format(closest_connectpoint))
-        # print("distance hou-cntpoint: ", distance_to_cnctpoint)
+                # make a random new segment
+                dx, dy = new_cable_segment()
 
-        # while cable from house hasnt reached battery
-        while hou.connected == False:
+                # calc coords of new cable point
+                cable_point = [cable_instance[cable_len][0] + dx, cable_instance[cable_len][1] + dy]
 
-            # make a random new segment
-            dx, dy = new_cable_segment()
+                # checks on bitmap if the coordinate is valid (not outside of edges)
+                if bitmap[cable_point[0]+1][cable_point[1]+1] == 1:
 
-            # calc coords of new cable point
-            cable_point = [cable_instance[cable_len][0] + dx, cable_instance[cable_len][1] + dy]
+                    # only move if getting closer to connectpoint, else try another move
+                    if manhattan_distance(cable_point, closest_connectpoint) < distance_to_cnctpoint:
 
-            # checks on bitmap if the coordinate is valid (not outside of edges)
-            if bitmap[cable_point[0]+1][cable_point[1]+1] == 1:
-
-                # only move if getting closer to connectpoint, else try another move
-                if manhattan_distance(cable_point, closest_connectpoint) < distance_to_cnctpoint:
-
-                    # checks if cable reached an available battery
-                    if cable_point[0] == closest_connectpoint[0] and cable_point[1] == closest_connectpoint[1]:
-
-                        if bat_to_cnct.av_cap >= hou.maxoutput:
-                            bat_to_cnct.av_cap -= hou.maxoutput
-                            bat_to_cnct.connected_to.append(hou)
+                        # checks if cable reached an available battery
+                        if cable_point[0] == closest_connectpoint[0] and cable_point[1] == closest_connectpoint[1]:
                             hou.connected = True
-                            hou_count += 1
 
-                            # loop through houses and check if any house fits.
-                            # find the smallest available maxoutput
-                            min_output = 100
-                            for hou_for_min_find in House._registry:
-                                if hou_for_min_find.connected == False:
-                                    if hou_for_min_find.maxoutput < min_output:
-                                        min_output = hou_for_min_find.maxoutput
 
-                            if min_output > bat_to_cnct.av_cap:
-                                print("bat at {},{} is full".format(bat_to_cnct.x, bat_to_cnct.y))
-                                if bat_to_cnct not in bat_full_list:
-                                    bat_full_list.append(bat_to_cnct)
-                                    print(bat_full_list)
+                        cable_instance.append(cable_point)
+                        cable_len += 1
+                        distance_to_cnctpoint = manhattan_distance(cable_point, closest_connectpoint)
+                # else: try again
 
-                                if len(bat_full_list) == 5:
-                                    print("jawel man kijk dan")
-                                    for bat in Battery._registry:
-                                        print("batleft:", bat.av_cap)
-                                    for hou in House._registry:
-                                        if hou.connected == False:
-                                            print("houleft:", hou.maxoutput)
-                                    return False
+            # transpose the cable list from ([xy][xy]) to ([xxx][yyy])
+            cable_instance = (np.array(cable_instance)).T
 
-                    cable_instance.append(cable_point)
-                    cable_len += 1
-                    distance_to_cnctpoint = manhattan_distance(cable_point, closest_connectpoint)
-            # else: try again
-
-        # transpose the cable list from ([xy][xy]) to ([xxx][yyy])
-        cable_instance = (np.array(cable_instance)).T
-
-        cable = Cable(cable_instance[0], cable_instance[1], cable_len)
+            cable = Cable(cable_instance[0], cable_instance[1], cable_len)
+            
+            hou.cable = cable
+            bat.cables.append(cable)
         
-        hou.cable = cable
-        bat_to_cnct.cables.append(cable)
-        
-    return True
+    return
