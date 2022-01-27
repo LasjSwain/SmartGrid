@@ -48,6 +48,9 @@ def draw_rep_plot():
         ax.minorticks_on()
         ax.grid(which='both')
 
+        # makes grid a nice square to give proper idea of distances
+        ax.set_aspect("equal")
+
         ax.set_title("REP: total shared cable length: {}".format(find_cable_length()))
 
         plt.show()
@@ -85,6 +88,9 @@ def draw_all_plot():
     ax.minorticks_on()
     ax.grid(which='both')
     ax.legend()
+
+    # makes grid a nice square to give proper idea of distances
+    ax.set_aspect("equal")
 
     plt.show()
 
