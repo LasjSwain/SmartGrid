@@ -62,6 +62,8 @@ print("yeah this should be about enough huh")
 from output import draw_rep_plot, draw_all_plot, make_json
 from output import find_cable_length
 
+min_cable_length = 10**6
+
 for idx, combi_dict in enumerate(configurations):
     # empty cable to reset count
     Cable._registry = []
@@ -71,8 +73,15 @@ for idx, combi_dict in enumerate(configurations):
     cable_length = find_cable_length()
     print("{} has length {}".format(idx+1, cable_length))
 
-    # draw_all_plot()
-    draw_rep_plot()
+    # find the shortest configuration
+    if cable_length < min_cable_length:
+        min_cable_length = cable_length
+        shortest_config = combi_dict
+
+# remake and plot the shortest config:
+make_cable(shortest_config, bitmap)
+# draw_all_plot()
+draw_rep_plot()
 
 # jason quit working after shared algo implementation
 # make_json(DISTRICT, total_cable_len)

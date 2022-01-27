@@ -99,7 +99,6 @@ def make_cable(combi_dict, bitmap):
             cable = Cable(cable_instance[0], cable_instance[1], cable_len)
             
             hou.cable = cable
-            # bat.cables.append(cable)
 
             for find_bat in Battery._registry:
                 if find_bat.x == bat.x and find_bat.y == bat.y:

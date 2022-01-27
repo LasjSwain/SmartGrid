@@ -36,18 +36,11 @@ def draw_rep_plot():
     for bat in Battery._registry:
         fig, ax = plt.subplots()
 
-        total_cable_len = 0
-
         ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
         ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
 
-        cable_len_bat = 0
-
         for cab in bat.cables:
             ax.plot(cab.x_coords, cab.y_coords, c='green')
-            cable_len_bat += cab.length
-
-        total_cable_len += cable_len_bat
 
         # some nice ticks and grid etc
         ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5), 
@@ -55,7 +48,7 @@ def draw_rep_plot():
         ax.minorticks_on()
         ax.grid(which='both')
 
-        ax.set_title("REP: total shared cable length: {}".format(total_cable_len))
+        ax.set_title("REP: total shared cable length: {}".format(find_cable_length()))
 
         plt.show()
 
@@ -81,12 +74,10 @@ def draw_all_plot():
     ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
     ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
 
-    total_cable_len = 0
     for cab in Cable._registry:
         ax.plot(cab.x_coords, cab.y_coords, c='green')
-        total_cable_len += cab.length
 
-    ax.set_title("ALL: Total shared cable length: {}".format(total_cable_len))
+    ax.set_title("ALL: Total shared cable length: {}".format(find_cable_length()))
 
     # some nice ticks and grid etc
     ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5), 
