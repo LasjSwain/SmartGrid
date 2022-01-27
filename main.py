@@ -44,7 +44,7 @@ from algorithms.algo_astar import make_cable
 
 # find 10 configurations to later calculate shortest length
 configurations = []
-while len(configurations) < 3:
+while len(configurations) < 2:
 
     legal_solution = False
     while not legal_solution:
@@ -59,35 +59,20 @@ while len(configurations) < 3:
 
 print("yeah this should be about enough huh")
 
-from output import draw_sub_plot, draw_rep_plot, draw_all_plot, make_json
+from output import draw_rep_plot, draw_all_plot, make_json
 from output import find_cable_length
 
-# both the combi_dicts seem fine
-# they are put in the same algo so it should work
-# but only the last one gets a length > 0
-
-# it seems like the problem is that for the first iteration, the battery is
-# not connected to any cable both before and after make_cable, while for the
-# last one, it isnt before, but it is after
-
-
 for idx, combi_dict in enumerate(configurations):
-    print(Battery._registry[0].cables)
+    # empty cable to reset count
+    Cable._registry = []
 
     make_cable(combi_dict, bitmap)
-
-    # print(Battery._registry[0].connected_to)
-    print(Battery._registry[0].cables)
 
     cable_length = find_cable_length()
     print("{} has length {}".format(idx+1, cable_length))
 
-    # empty cable to reset count
-    Cable._registry = []
-
     # draw_all_plot()
-    # draw_sub_plot()
-    # draw_rep_plot()
+    draw_rep_plot()
 
 # jason quit working after shared algo implementation
 # make_json(DISTRICT, total_cable_len)

@@ -26,18 +26,18 @@ def draw_rep_plot():
     for bat in Battery._registry:
         bat_coords[0].append(bat.x)
         bat_coords[1].append(bat.y)
+
+    hou_coords = [[], []]
+    for hou in House._registry:
+        hou_coords[0].append(hou.x)
+        hou_coords[1].append(hou.y)
     
     # gather coords of all object instances and format in scatterable way
     for bat in Battery._registry:
         fig, ax = plt.subplots()
 
-        hou_coords = [[], []]
         total_cable_len = 0
 
-        for hou in House._registry:
-            hou_coords[0].append(hou.x)
-            hou_coords[1].append(hou.y)
-
         ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
         ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
 
@@ -55,57 +55,9 @@ def draw_rep_plot():
         ax.minorticks_on()
         ax.grid(which='both')
 
-        ax.set_title("total shared cable length: {}".format(total_cable_len))
+        ax.set_title("REP: total shared cable length: {}".format(total_cable_len))
 
         plt.show()
-
-    return
-
-# draw a visualisation of the grid, each battery networks in a subplot
-def draw_sub_plot():
-
-    fig, ax = plt.subplots()
-
-    bat_coords = [[], []]
-    hou_coords = [[], []]
-    total_cable_len = 0
-    
-    # gather coords of all object instances and format in scatterable way
-    x_plot = 0
-    y_plot = 0
-    for bat in Battery._registry:
-        bat_coords[0].append(bat.x)
-        bat_coords[1].append(bat.y)
-
-        for hou in bat.connected_to:
-            hou_coords[0].append(hou.x)
-            hou_coords[1].append(hou.y)
-
-        ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
-        ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
-
-        cable_len_bat = 0
-
-        for cab in bat.cables:
-            ax.plot(cab.x_coords, cab.y_coords, c='green')
-            cable_len_bat += cab.length
-
-        total_cable_len += cable_len_bat
-
-        # some nice ticks and grid etc
-        ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5), 
-        ylim=(-5, 55), yticks=np.arange(0, 51, 5))
-        ax.minorticks_on()
-        ax.grid(which='both')
-
-        x_plot += 1
-        if x_plot == 3:
-            y_plot += 1
-            x_plot = 0
-
-    fig.suptitle("total shared cable length: {}".format(total_cable_len))
-
-    plt.show()
 
     return
 
@@ -134,7 +86,7 @@ def draw_all_plot():
         ax.plot(cab.x_coords, cab.y_coords, c='green')
         total_cable_len += cab.length
 
-    ax.set_title("Total shared cable length: {}".format(total_cable_len))
+    ax.set_title("ALL: Total shared cable length: {}".format(total_cable_len))
 
     # some nice ticks and grid etc
     ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5), 

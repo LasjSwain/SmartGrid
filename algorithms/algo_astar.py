@@ -4,6 +4,7 @@
 # algo_astar provides an approach to a solution via the A* algorithm for pathfinding
 
 import dis
+from gettext import find
 from hashlib import new
 import sys
 import numpy as np
@@ -31,8 +32,8 @@ def new_cable_segment():
 def make_cable(combi_dict, bitmap):
 
     # reset all houses to not connected to re-use this variable
-    for hou in House._registry:
-        hou.connected = False
+    # for hou in House._registry:
+    #     hou.connected = False
 
     for bat in combi_dict:
         # print("bat {},{} is connected to {} houses".format(bat.x, bat.y, len(bat.connected_to)))
@@ -40,7 +41,6 @@ def make_cable(combi_dict, bitmap):
 
             # have to set to false again because this is another list than house,_registry
             hou.connected = False
-
 
             closest_connectpoint = ''
 
@@ -99,6 +99,12 @@ def make_cable(combi_dict, bitmap):
             cable = Cable(cable_instance[0], cable_instance[1], cable_len)
             
             hou.cable = cable
-            bat.cables.append(cable)
+            # bat.cables.append(cable)
+
+            for find_bat in Battery._registry:
+                if find_bat.x == bat.x and find_bat.y == bat.y:
+                    find_bat.cables.append(cable)
+
+            
         
     return
