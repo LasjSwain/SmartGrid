@@ -3,6 +3,7 @@
 # part of Programmeertheorie, Minor Programmeren, UvA
 # main runs all the necessary functions: spine of the program
 
+from lib2to3.pytree import HUGE
 import pandas as pd
 import sys
 import matplotlib.pyplot as plt
@@ -44,7 +45,7 @@ from algorithms.algo_astar import make_cable
 
 # find 10 configurations to later calculate shortest length
 configurations = []
-while len(configurations) < 2:
+while len(configurations) < 1:
 
     legal_solution = False
     while not legal_solution:
@@ -59,7 +60,7 @@ while len(configurations) < 2:
 
 print("yeah this should be about enough huh")
 
-from output import draw_rep_plot, draw_all_plot, make_json
+from output import draw_rep_plot, draw_all_plot, draw_start_end, make_json
 from output import find_cable_length
 
 min_cable_length = 10**6
@@ -70,20 +71,34 @@ for idx, combi_dict in enumerate(configurations):
 
     make_cable(combi_dict, bitmap)
 
-    cable_length = find_cable_length()
-    print("{} has length {}".format(idx+1, cable_length))
+    cablen = find_cable_length()
+    print("{} has length {}".format(idx+1, cablen))
 
     # find the shortest configuration
-    if cable_length < min_cable_length:
-        min_cable_length = cable_length
+    if cablen < min_cable_length:
+        min_cable_length = cablen
         shortest_config = combi_dict
 
+    # reset
+    for bat in Battery._registry:
+        bat.cables = []
+    for hou in House._registry:
+        hou.cable = "emptied"
+
 # remake and plot the shortest config:
+# reset
+Cable._registry = []
+for bat in Battery._registry:
+    bat.cables = []
+for hou in House._registry:
+    hou.cable = "emptied"
+
 make_cable(shortest_config, bitmap)
 # draw_all_plot()
 draw_rep_plot()
+# draw_start_end()
 
 # jason quit working after shared algo implementation
-# make_json(DISTRICT, total_cable_len)
+make_json(DISTRICT)
 
 

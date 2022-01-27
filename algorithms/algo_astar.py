@@ -31,15 +31,11 @@ def new_cable_segment():
 # run a cable from a house to a battery (random)
 def make_cable(combi_dict, bitmap):
 
-    # reset all houses to not connected to re-use this variable
-    # for hou in House._registry:
-    #     hou.connected = False
-
     for bat in combi_dict:
         # print("bat {},{} is connected to {} houses".format(bat.x, bat.y, len(bat.connected_to)))
         for hou in bat.connected_to:
 
-            # have to set to false again because this is another list than house,_registry
+            # set all houses to not connected to re-use variable
             hou.connected = False
 
             closest_connectpoint = ''
@@ -57,7 +53,7 @@ def make_cable(combi_dict, bitmap):
                     for idx in range(len(cable.x_coords)):
                         cab_point = [cable.x_coords[idx], cable.y_coords[idx]]
                         if manhattan_distance([hou.x, hou.y], cab_point) < min_distance:
-                            min_distance = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
+                            min_distance = manhattan_distance([hou.x, hou.y], cab_point)
                             closest_connectpoint = cab_point
 
             # start building the cable at the house
@@ -94,16 +90,25 @@ def make_cable(combi_dict, bitmap):
                 # else: try again
 
             # transpose the cable list from ([xy][xy]) to ([xxx][yyy])
+            # print("hou: ", hou.x, hou.y)
+            # print("cab: ", cable_instance)
+            # print("bat: ", bat.x, bat.y)
+            # print("cnct: ", closest_connectpoint)
+
             cable_instance = (np.array(cable_instance)).T
 
             cable = Cable(cable_instance[0], cable_instance[1], cable_len)
             
             hou.cable = cable
+            bat.cables.append(cable)
 
+            # also change og registry instead of only battery objects in combi_dict
             for find_bat in Battery._registry:
                 if find_bat.x == bat.x and find_bat.y == bat.y:
                     find_bat.cables.append(cable)
-
-            
+                    
+            for find_hou in House._registry:
+                if find_hou.x == hou.x and find_hou.y == hou.y:
+                    find_hou.cable = cable    
         
     return
