@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-DISTRICT = 1
+DISTRICT = 2
 
 # GENERAL CLASS COMMENT:
 # registry part is necessary to easily loop over all instances of the object later
@@ -33,34 +33,24 @@ def load_district(dis_id):
         coord_pair = [int(hou['x']), int(hou['y'])]
         house = House(coord_pair[0], coord_pair[1], hou['maxoutput'], 'here will be a cable')
 
-    # sorted_house_objects = sorted([hou for hou in House._registry], key=lambda x: x.maxoutput, reverse=True)
-
     # creates bitmap for grid to checks for edges
     bitmap = np.pad([[1 for x in range(51)] for y in range(51)], pad_width=1)
 
     # return sorted_house_objects, bitmap  
     return bitmap
 
-
-# sorted_house_objects, bitmap = load_district(DISTRICT)
-
-
 from algorithms.algo_combi import find_random_combi
-from output import find_cable_length
 from algorithms.algo_astar import make_cable
 
 # find 10 configurations to later calculate shortest length
 configurations = []
-while len(configurations) < 10:
+while len(configurations) < 2:
 
     legal_solution = False
-    attempt = 0
     while not legal_solution:
-        attempt += 1
-        # print("Attempt to configure {}".format(attempt))
         Battery._registry = []
         House._registry = []
-        # sorted_house_objects, bitmap = load_district(DISTRICT)
+
         bitmap = load_district(DISTRICT)
         legal_solution, combi_dict = find_random_combi()
 
@@ -69,22 +59,35 @@ while len(configurations) < 10:
 
 print("yeah this should be about enough huh")
 
+from output import draw_sub_plot, draw_rep_plot, draw_all_plot, make_json
+from output import find_cable_length
+
+# both the combi_dicts seem fine
+# they are put in the same algo so it should work
+# but only the last one gets a length > 0
+
+# it seems like the problem is that for the first iteration, the battery is
+# not connected to any cable both before and after make_cable, while for the
+# last one, it isnt before, but it is after
+
+
 for idx, combi_dict in enumerate(configurations):
-    Cable._registry = []
+    # Cable._registry = []
+
+    print(Battery._registry[0].connected_to)
+    print(Battery._registry[0].cables)
+
     make_cable(combi_dict, bitmap)
-        
-    # for cab in Cable._registry:
-    #     print(cab.length)
-    
+
+    print(Battery._registry[0].connected_to)
+    print(Battery._registry[0].cables)
+
     cable_length = find_cable_length()
     print("{} has length {}".format(idx+1, cable_length))
 
-print("lets randomly plot the last one cause who wants the shortest")
-
-from output import draw_sub_plot, draw_rep_plot, draw_all_plot, make_json
-draw_all_plot()
-# draw_sub_plot()
-# draw_rep_plot()
+    # draw_all_plot()
+    # draw_sub_plot()
+    # draw_rep_plot()
 
 # jason quit working after shared algo implementation
 # make_json(DISTRICT, total_cable_len)

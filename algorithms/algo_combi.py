@@ -14,7 +14,7 @@ def find_random_combi():
 
     # combi dict is the dict in which to save the config
     combi_dict = dict()
-    bat_full_list = []
+    # bat_full_list = []
     
     # make empty lists for each bat to save houses in later
     for bat in Battery._registry:

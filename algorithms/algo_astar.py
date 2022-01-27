@@ -3,6 +3,7 @@
 # part of Programmeertheorie, Minor Programmeren, UvA
 # algo_astar provides an approach to a solution via the A* algorithm for pathfinding
 
+import dis
 from hashlib import new
 import sys
 import numpy as np
@@ -47,7 +48,7 @@ def make_cable(combi_dict, bitmap):
             # else find closest cable connected to that battery
             else:
                 # a (high) start value for min distance
-                min_distance = 100      
+                min_distance = 100
                 for cable in bat.cables:
                     for idx in range(len(cable.x_coords)):
                         cab_point = [cable.x_coords[idx], cable.y_coords[idx]]
@@ -59,6 +60,10 @@ def make_cable(combi_dict, bitmap):
             cable_instance = [[hou.x, hou.y]]
             cable_len = 0
             distance_to_cnctpoint = manhattan_distance([hou.x, hou.y], closest_connectpoint)
+
+            # dont pull a cable if the house is already at its connectpoint
+            if distance_to_cnctpoint == 0:
+                hou.connected = True
 
             # while cable from house hasnt reached battery
             while hou.connected == False:
@@ -75,21 +80,19 @@ def make_cable(combi_dict, bitmap):
                     # only move if getting closer to connectpoint, else try another move
                     if manhattan_distance(cable_point, closest_connectpoint) < distance_to_cnctpoint:
 
-                        # checks if cable reached an available battery
-                        if cable_point[0] == closest_connectpoint[0] and cable_point[1] == closest_connectpoint[1]:
-                            hou.connected = True
-
-
                         cable_instance.append(cable_point)
                         cable_len += 1
                         distance_to_cnctpoint = manhattan_distance(cable_point, closest_connectpoint)
+
+                        # checks if cable reached the battery
+                        if cable_point[0] == closest_connectpoint[0] and cable_point[1] == closest_connectpoint[1]:
+                            hou.connected = True
                 # else: try again
 
             # transpose the cable list from ([xy][xy]) to ([xxx][yyy])
             cable_instance = (np.array(cable_instance)).T
 
             cable = Cable(cable_instance[0], cable_instance[1], cable_len)
-            print(cable.length)
             
             hou.cable = cable
             bat.cables.append(cable)

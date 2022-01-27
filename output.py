@@ -134,7 +134,7 @@ def draw_all_plot():
         ax.plot(cab.x_coords, cab.y_coords, c='green')
         total_cable_len += cab.length
 
-    ax.set_title("total shared cable length: {}".format(total_cable_len))
+    ax.set_title("Total shared cable length: {}".format(total_cable_len))
 
     # some nice ticks and grid etc
     ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5), 
