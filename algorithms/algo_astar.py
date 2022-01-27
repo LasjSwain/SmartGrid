@@ -37,7 +37,11 @@ def make_cable(combi_dict, bitmap):
     for bat in combi_dict:
         # print("bat {},{} is connected to {} houses".format(bat.x, bat.y, len(bat.connected_to)))
         for hou in bat.connected_to:
-        
+
+            # have to set to false again because this is another list than house,_registry
+            hou.connected = False
+
+
             closest_connectpoint = ''
 
             # find the nearest connectable point to this battery

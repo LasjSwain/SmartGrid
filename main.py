@@ -44,7 +44,7 @@ from algorithms.algo_astar import make_cable
 
 # find 10 configurations to later calculate shortest length
 configurations = []
-while len(configurations) < 2:
+while len(configurations) < 3:
 
     legal_solution = False
     while not legal_solution:
@@ -72,18 +72,18 @@ from output import find_cable_length
 
 
 for idx, combi_dict in enumerate(configurations):
-    # Cable._registry = []
-
-    print(Battery._registry[0].connected_to)
     print(Battery._registry[0].cables)
 
     make_cable(combi_dict, bitmap)
 
-    print(Battery._registry[0].connected_to)
+    # print(Battery._registry[0].connected_to)
     print(Battery._registry[0].cables)
 
     cable_length = find_cable_length()
     print("{} has length {}".format(idx+1, cable_length))
+
+    # empty cable to reset count
+    Cable._registry = []
 
     # draw_all_plot()
     # draw_sub_plot()
