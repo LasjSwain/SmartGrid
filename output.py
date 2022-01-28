@@ -7,6 +7,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import json
+import pandas as pd
 
 from classes import House, Battery, Cable
 
@@ -208,7 +209,7 @@ def make_json(DISTRICT):
 
             # at each cable segment coordinate as a line to the cable dict
             # + 1 for number of points inst of len, + 1 for arriving at last point
-            for cable_idx in range(hou.cable.length + 1):
+            for cable_idx in range(hou.cable.length):
                 x = hou.cable.x_coords[cable_idx]
                 y = hou.cable.y_coords[cable_idx]
                 cable_list.append("{},{}".format(x, y))
@@ -221,5 +222,61 @@ def make_json(DISTRICT):
 
     with open('output/output.json', 'w') as fp:
         json.dump(output, fp)
+
+    return
+
+# recreate all house, battery and cable objects from the best saved json
+def jason_remakes():
+
+    # reset registry's; load new ones from output.json
+    Cable._registry = []
+    House._registry = []
+    Battery._registry = []
+
+    with open('output/output.json', 'r') as fp:
+        data = json.load(fp)
+
+    for bat in data[1:]:
+
+        x = int(bat['location'].split(',')[0])
+        y = int(bat['location'].split(',')[1])
+        cap = bat['capacity']
+
+        battery = Battery(x, y, cap)
+
+        for hou in bat['houses']:
+            x = int(hou['location'].split(',')[0])
+            y = int(hou['location'].split(',')[1])
+            maxoutput = hou['output']
+
+            x_coords = []
+            y_coords = []
+            for cabpoint in hou['cables']:
+                x_coords.append(int(cabpoint.split(',')[0]))
+                y_coords.append(int(cabpoint.split(',')[1]))
+
+            cable = Cable(x_coords, y_coords, len(x_coords))
+
+            house = House(x, y, maxoutput, cable)
+
+    return
+
+# make a csv file of all lengths to later make a histogram
+def length_csv(lengths):
+    dict = {'length': lengths} 
+    df = pd.DataFrame(dict) 
+    df.to_csv('output/lengths.csv', index=False)
+
+    return
+
+# make a histogram of all total cable lengths from the saved csv
+def csv_hist(ATTEMPTS):
+
+    df = pd.read_csv('output/lengths.csv')
+    df.plot(kind='hist',
+        bins=int(ATTEMPTS / 10),
+        title='Histogram of cable lengths, {} attempts'.format(ATTEMPTS))
+    plt.xlabel('Total cable length')
+    plt.ylabel("Frequency");
 
     return

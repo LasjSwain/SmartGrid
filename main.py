@@ -11,9 +11,7 @@ import numpy as np
 import random
 
 DISTRICT = 2
-
-# GENERAL CLASS COMMENT:
-# registry part is necessary to easily loop over all instances of the object later
+ATTEMPTS = 100
 
 from classes import House, Battery, Cable
 
@@ -37,68 +35,72 @@ def load_district(dis_id):
     # creates bitmap for grid to checks for edges
     bitmap = np.pad([[1 for x in range(51)] for y in range(51)], pad_width=1)
 
-    # return sorted_house_objects, bitmap  
     return bitmap
 
 from algorithms.algo_combi import find_random_combi
 from algorithms.algo_astar import make_cable
 
-# find 10 configurations to later calculate shortest length
+# find ... configurations to later calculate shortest length
 configurations = []
-while len(configurations) < 1:
+while len(configurations) < ATTEMPTS:
 
     legal_solution = False
     while not legal_solution:
         Battery._registry = []
         House._registry = []
 
+        # load in all houses, batteries and borders
         bitmap = load_district(DISTRICT)
+
+        # find a house-battery configuration
         legal_solution, combi_dict = find_random_combi()
 
     configurations.append(combi_dict)
-    print("Bingo! We got config {}".format(len(configurations)))
+
+    if len(configurations) % 10 == 0:
+        print("We got {} configs".format(len(configurations)))
 
 print("yeah this should be about enough huh")
 
-from output import draw_rep_plot, draw_all_plot, draw_start_end, make_json
-from output import find_cable_length
+from output import draw_rep_plot, draw_all_plot, draw_start_end, find_cable_length
+from output import make_json, jason_remakes, length_csv, csv_hist
 
 min_cable_length = 10**6
 
+# save a list of each length
+lengths = []
+
+# for each config, pull cables, find length, save the shortest
 for idx, combi_dict in enumerate(configurations):
-    # empty cable to reset count
-    Cable._registry = []
 
     make_cable(combi_dict, bitmap)
 
     cablen = find_cable_length()
-    print("{} has length {}".format(idx+1, cablen))
+    lengths.append(cablen)
 
     # find the shortest configuration
     if cablen < min_cable_length:
         min_cable_length = cablen
-        shortest_config = combi_dict
+        # shortest_config = combi_dict
+        make_json(DISTRICT)
 
-    # reset
+    # reset variables related to cables
+    Cable._registry = []
     for bat in Battery._registry:
         bat.cables = []
     for hou in House._registry:
         hou.cable = "emptied"
 
-# remake and plot the shortest config:
-# reset
-Cable._registry = []
-for bat in Battery._registry:
-    bat.cables = []
-for hou in House._registry:
-    hou.cable = "emptied"
 
-make_cable(shortest_config, bitmap)
-# draw_all_plot()
-draw_rep_plot()
+# remake from json:
+jason_remakes()
+
+# save all lengths in a csv
+length_csv(lengths)
+
+# make a histogram of that csv
+csv_hist(ATTEMPTS)
+
+draw_all_plot()
+# draw_rep_plot()
 # draw_start_end()
-
-# jason quit working after shared algo implementation
-make_json(DISTRICT)
-
-

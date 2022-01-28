@@ -35,6 +35,9 @@ def make_cable(combi_dict, bitmap):
         # print("bat {},{} is connected to {} houses".format(bat.x, bat.y, len(bat.connected_to)))
         for hou in bat.connected_to:
 
+            # number of cable points on battery; not counted in cable_leng
+            # bat_connectpoints = 0
+
             # set all houses to not connected to re-use variable
             hou.connected = False
 
@@ -44,6 +47,7 @@ def make_cable(combi_dict, bitmap):
             # if bat has no cables, closest connectable point = bat self
             if len(bat.cables) == 0:
                 closest_connectpoint = [bat.x, bat.y]
+                # bat_connectpoints += 1
 
             # else find closest cable connected to that battery
             else:
@@ -97,7 +101,7 @@ def make_cable(combi_dict, bitmap):
 
             cable_instance = (np.array(cable_instance)).T
 
-            cable = Cable(cable_instance[0], cable_instance[1], cable_len)
+            cable = Cable(cable_instance[0], cable_instance[1], len(cable_instance[0]))
             
             hou.cable = cable
             bat.cables.append(cable)
@@ -109,6 +113,6 @@ def make_cable(combi_dict, bitmap):
                     
             for find_hou in House._registry:
                 if find_hou.x == hou.x and find_hou.y == hou.y:
-                    find_hou.cable = cable    
+                    find_hou.cable = cable
         
     return
