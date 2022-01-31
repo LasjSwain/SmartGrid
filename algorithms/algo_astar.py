@@ -10,7 +10,9 @@ import sys
 import numpy as np
 import random
 
-from classes import House, Battery, Cable
+from classes.house import House
+from classes.battery import Battery
+from classes.cable import Cable
 
 # function to calculate manhattan distance between two points, which is the absolute difference between the coordinates
 def manhattan_distance(a, b):

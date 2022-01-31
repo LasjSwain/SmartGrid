@@ -13,7 +13,9 @@ import random
 DISTRICT = 2
 ATTEMPTS = 100
 
-from classes import House, Battery, Cable
+from classes.house import House
+from classes.battery import Battery
+from classes.cable import Cable
 
 # load in the locations of the houses and batteries as provided
 def load_district(dis_id):
