@@ -11,7 +11,6 @@ import numpy as np
 import random
 
 DISTRICT = 2
-ATTEMPTS = 100
 
 from classes.house import House
 from classes.battery import Battery
@@ -27,24 +26,49 @@ def load_district(dis_id):
     for idx, bat in df_bat.iterrows():
         # comma separated string -> list of [x, y] ints
         coord_pair = list(map(int, bat['positie'].split(',')))
-        battery = Battery(coord_pair[0], coord_pair[1], bat['capaciteit'])
+        battery = Battery(idx, coord_pair[0], coord_pair[1], bat['capaciteit'])
     
     for idx, hou in df_hou.iterrows():
         # comma separated string -> list of [x, y] ints
         coord_pair = [int(hou['x']), int(hou['y'])]
-        house = House(coord_pair[0], coord_pair[1], hou['maxoutput'], 'here will be a cable')
+        house = House(idx, coord_pair[0], coord_pair[1], hou['maxoutput'], 'here will be a cable')
 
     # creates bitmap for grid to checks for edges
     bitmap = np.pad([[1 for x in range(51)] for y in range(51)], pad_width=1)
 
     return bitmap
 
-from algorithms.algo_combi import find_random_combi
+from algorithms.algo_combi import find_random_combi, find_closest_combi, make_dist_list, convert_dist_to_id
 from algorithms.algo_astar import make_cable
+
+# THIS WAS FOR RANDOM: LATER DO SOMETHING COOL WITH IT
+# find ... configurations to later calculate shortest length
+# configurations = []
+# while len(configurations) < ATTEMPTS:
+
+#     legal_solution = False
+#     while not legal_solution:
+#         Battery._registry = []
+#         House._registry = []
+
+#         # load in all houses, batteries and borders
+#         bitmap = load_district(DISTRICT)
+
+#         # find a house-battery configuration
+#         legal_solution, combi_dict = find_random_combi()
+
+#     configurations.append(combi_dict)
+
+#     if len(configurations) % 10 == 0:
+#         print("We got {} configs".format(len(configurations)))
 
 # find ... configurations to later calculate shortest length
 configurations = []
-while len(configurations) < ATTEMPTS:
+orders = []
+current_attempt = 0
+number_options = 150 * 5
+
+while current_attempt < number_options:
 
     legal_solution = False
     while not legal_solution:
@@ -54,15 +78,23 @@ while len(configurations) < ATTEMPTS:
         # load in all houses, batteries and borders
         bitmap = load_district(DISTRICT)
 
+        # make a (shuffled based on current_attempt) new possible config order
+        dist_list = make_dist_list(current_attempt)
+        id_list = convert_dist_to_id(dist_list)
+
         # find a house-battery configuration
-        legal_solution, combi_dict = find_random_combi()
+        legal_solution, combi_dict = find_closest_combi(dist_list)
 
-    configurations.append(combi_dict)
+        current_attempt += 1
 
-    if len(configurations) % 10 == 0:
-        print("We got {} configs".format(len(configurations)))
+    if id_list not in orders:
+        configurations.append(combi_dict)
+        orders.append(id_list)
 
-print("yeah this should be about enough huh")
+        if len(configurations) % 1 == 0:
+            print("We got {} configs".format(len(configurations)))
+
+print("out of a possible {} options", number_options)
 
 from output import draw_rep_plot, draw_all_plot, draw_start_end, find_cable_length
 from output import make_json, jason_remakes, length_csv, csv_hist
@@ -79,6 +111,9 @@ for idx, combi_dict in enumerate(configurations):
 
     cablen = find_cable_length()
     lengths.append(cablen)
+
+
+    # print("config {} has len {}".format(idx, cablen))
 
     # find the shortest configuration
     if cablen < min_cable_length:
@@ -101,8 +136,8 @@ jason_remakes()
 length_csv(lengths)
 
 # make a histogram of that csv
-csv_hist(ATTEMPTS)
+csv_hist(number_options)
 
-# draw_all_plot()
-draw_rep_plot()
+draw_all_plot()
+# draw_rep_plot()
 # draw_start_end()

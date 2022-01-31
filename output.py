@@ -244,7 +244,8 @@ def jason_remakes():
         y = int(bat['location'].split(',')[1])
         cap = bat['capacity']
 
-        battery = Battery(x, y, cap)
+        # note: dont add actual id here but guess we dont need it here anymore
+        battery = Battery(0, x, y, cap)
 
         for hou in bat['houses']:
             x = int(hou['location'].split(',')[0])
@@ -259,7 +260,8 @@ def jason_remakes():
 
             cable = Cable(x_coords, y_coords, len(x_coords))
 
-            house = House(x, y, maxoutput, cable)
+            # note: dont add actual id here but guess we dont need it here anymore
+            house = House(0, x, y, maxoutput, cable)
 
     return
 
@@ -272,12 +274,12 @@ def length_csv(lengths):
     return
 
 # make a histogram of all total cable lengths from the saved csv
-def csv_hist(ATTEMPTS):
+def csv_hist(number_options):
 
     df = pd.read_csv('output/lengths.csv')
     df.plot(kind='hist',
-        bins=int(ATTEMPTS / 10),
-        title='Histogram of cable lengths, {} attempts'.format(ATTEMPTS))
+        bins=int(number_options / 10),
+        title='Histogram of cable lengths, {} attempts'.format(number_options))
     plt.xlabel('Total cable length')
     plt.ylabel("Frequency");
 

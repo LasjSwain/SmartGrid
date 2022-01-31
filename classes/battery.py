@@ -9,8 +9,9 @@
 class Battery:
     _registry = []
 
-    def __init__(self, x, y, capacity):
+    def __init__(self, id, x, y, capacity):
         self._registry.append(self)
+        self.id = id
         self.x = x
         self.y = y
         self.capacity = capacity

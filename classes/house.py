@@ -9,8 +9,9 @@
 class House():
     _registry = []
 
-    def __init__(self, x, y, maxoutput, cable):
+    def __init__(self, id, x, y, maxoutput, cable):
         self._registry.append(self)
+        self.id = id
         self.x = x
         self.y = y
         self.maxoutput = maxoutput
