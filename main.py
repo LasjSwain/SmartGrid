@@ -11,6 +11,8 @@ import numpy as np
 import random
 
 DISTRICT = 2
+NUMBER_HOUSES = 150
+NUMBER_BATTERIES = 5
 
 from classes.house import House
 from classes.battery import Battery
@@ -62,11 +64,19 @@ from algorithms.algo_astar import make_cable
 #     if len(configurations) % 10 == 0:
 #         print("We got {} configs".format(len(configurations)))
 
+# do you want to switch houses or batteries?
+switch_what = 'only houses'
+# switch_what = 'both'
+
+if switch_what == 'only houses':
+    number_options = NUMBER_HOUSES
+elif switch_what == 'both':
+    number_options = NUMBER_HOUSES * NUMBER_BATTERIES
+
 # find ... configurations to later calculate shortest length
 configurations = []
 orders = []
 current_attempt = 0
-number_options = 150 * 5
 
 while current_attempt < number_options:
 
@@ -79,13 +89,14 @@ while current_attempt < number_options:
         bitmap = load_district(DISTRICT)
 
         # make a (shuffled based on current_attempt) new possible config order
-        dist_list = make_dist_list(current_attempt)
+        dist_list = make_dist_list(current_attempt, switch_what)
         id_list = convert_dist_to_id(dist_list)
 
         # find a house-battery configuration
         legal_solution, combi_dict = find_closest_combi(dist_list)
 
         current_attempt += 1
+        print(current_attempt)
 
     if id_list not in orders:
         configurations.append(combi_dict)
@@ -94,7 +105,7 @@ while current_attempt < number_options:
         if len(configurations) % 1 == 0:
             print("We got {} configs".format(len(configurations)))
 
-print("out of a possible {} options", number_options)
+print("out of a possible {} options".format(number_options))
 
 from output import draw_rep_plot, draw_all_plot, draw_start_end, find_cable_length
 from output import make_json, jason_remakes, length_csv, csv_hist

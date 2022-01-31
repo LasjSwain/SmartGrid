@@ -79,7 +79,8 @@ def key_hous(elem):
 # 3) if unvalid; start with 2nd bat in order (1-2-3-4-5) - (2-1-3) + (2-1-3)
 
 # make a (each time shuffled) list of hou-bat combi's sorted on distance
-def make_dist_list(attempt):
+# NOTE: if we want to go from far->close, add reverse=True in both sorteds
+def make_dist_list(attempt, switch_what):
     dist_list = []
 
     for hou in House._registry:
@@ -87,15 +88,24 @@ def make_dist_list(attempt):
         for bat in Battery._registry:
             dist = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
             bat_dist.append([bat.id, bat, dist])
-        dist_list.append([[hou.id, hou], sorted(bat_dist, key=key_bats)])
+        dist_list.append([[hou.id, hou], sorted(bat_dist, key=key_bats, reverse=False)])
 
-    dist_list = sorted(dist_list, key=key_hous)
+    dist_list = sorted(dist_list, key=key_hous, reverse=False)
 
-    # depending on attempt, place list i steps back (123->231->312)
-    for i in range(attempt):
-        dist_list = dist_list[1:] + [dist_list[0]]
-
-    # now change the above thingy to something that also switches battery-orders
+    # switch both batteries and houses
+    if switch_what == 'both':
+        for i in range(attempt):
+            # every attempt, move a battery to the back
+            dist_list[i % 150][1] = dist_list[i % 150][1][1:] + [dist_list[i % 150][1][0]]
+            
+            # every 5 attempts, move a house to the back
+            if i % 5 == 0 and i != 0:
+                dist_list = dist_list[1:] + [dist_list[0]]
+    
+    # switch only houses
+    elif switch_what == 'only houses':
+        for i in range(attempt):
+            dist_list = dist_list[1:] + [dist_list[0]]
 
     return dist_list
 
