@@ -7,7 +7,9 @@ import sys
 import numpy as np
 import random
 
-from classes import House, Battery, Cable
+from classes.house import House
+from classes.battery import Battery
+from classes.cable import Cable
 
 # creates a new cable segment in random direction
 def new_cable_segment():

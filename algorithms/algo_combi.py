@@ -7,7 +7,9 @@ import sys
 import numpy as np
 import random
 
-from classes import House, Battery
+from classes.house import House
+from classes.battery import Battery
+from classes.cable import Cable
 
 # randomly find a house-battery configuration that is legal
 def find_random_combi():
