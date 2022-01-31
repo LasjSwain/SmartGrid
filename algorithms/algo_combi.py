@@ -4,7 +4,6 @@
 # algo_combi divides houses over batteries without overflowing their capacity
 
 import sys
-from xml.etree.ElementInclude import DEFAULT_MAX_INCLUSION_DEPTH
 import numpy as np
 import random
 

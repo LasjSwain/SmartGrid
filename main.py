@@ -129,7 +129,6 @@ for idx, combi_dict in enumerate(configurations):
     # find the shortest configuration
     if cablen < min_cable_length:
         min_cable_length = cablen
-        # shortest_config = combi_dict
         make_json(DISTRICT)
 
     # reset variables related to cables
@@ -138,7 +137,6 @@ for idx, combi_dict in enumerate(configurations):
         bat.cables = []
     for hou in House._registry:
         hou.cable = "emptied"
-
 
 # remake from json:
 jason_remakes()
