@@ -3,7 +3,6 @@
 # part of Programmeertheorie, Minor Programmeren, UvA
 # output draws a visual representation and produces a .json
 
-import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import json
@@ -50,6 +49,7 @@ COLORS = [
     "black"
 ]
 
+
 def find_cable_length():
 
     cable_length = 0
@@ -58,6 +58,7 @@ def find_cable_length():
         cable_length += cab.length
 
     return cable_length
+
 
 # draw a visualisation of the grid, repeated for each battery network
 def draw_rep_plot():
@@ -71,14 +72,14 @@ def draw_rep_plot():
     for hou in House._registry:
         hou_coords[0].append(hou.x)
         hou_coords[1].append(hou.y)
-    
+
     # gather coords of all object instances and format in scatterable way
     for bat in Battery._registry:
         fig, ax = plt.subplots()
-        
+
         # some nice ticks and grid etc
-        ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5), 
-        ylim=(-5, 55), yticks=np.arange(0, 51, 5))
+        ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5),
+            ylim=(-5, 55), yticks=np.arange(0, 51, 5))
         ax.minorticks_on()
         ax.grid(which='both')
 
@@ -97,6 +98,7 @@ def draw_rep_plot():
 
     return
 
+
 # draw a visualisation of the grid, all battery networks in 1 plot
 def draw_all_plot():
 
@@ -104,8 +106,8 @@ def draw_all_plot():
     ax.set_title("ALL: Total shared cable length: {}".format(find_cable_length()))
 
     # some nice ticks and grid etc
-    ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5), 
-       ylim=(-5, 55), yticks=np.arange(0, 51, 5))
+    ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5),
+        ylim=(-5, 55), yticks=np.arange(0, 51, 5))
     ax.minorticks_on()
     ax.grid(which='both')
     ax.legend()
@@ -135,6 +137,7 @@ def draw_all_plot():
 
     return
 
+
 def draw_start_end():
 
     bat_coords = [[], []]
@@ -146,13 +149,13 @@ def draw_start_end():
     for hou in House._registry:
         hou_coords[0].append(hou.x)
         hou_coords[1].append(hou.y)
-    
+
     # gather coords of all object instances and format in scatterable way
     for bat in Battery._registry:
         fig, ax = plt.subplots()
 
         # some nice ticks and grid etc
-        ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5), 
+        ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5),
         ylim=(-5, 55), yticks=np.arange(0, 51, 5))
         ax.minorticks_on()
         ax.grid(which='both')
@@ -174,6 +177,7 @@ def draw_start_end():
         plt.show()
 
     return
+
 
 # output a json file in the specified format to use check50
 def make_json(DISTRICT):
@@ -227,6 +231,7 @@ def make_json(DISTRICT):
 
     return
 
+
 # recreate all house, battery and cable objects from the best saved json
 def jason_remakes():
 
@@ -263,13 +268,15 @@ def jason_remakes():
 
     return
 
+
 # make a csv file of all lengths to later make a histogram
 def length_csv(lengths):
-    dict = {'length': lengths} 
-    df = pd.DataFrame(dict) 
+    dict = {'length': lengths}
+    df = pd.DataFrame(dict)
     df.to_csv('output/lengths.csv', index=False)
 
     return
+
 
 # make a histogram of all total cable lengths from the saved csv
 def csv_hist(ATTEMPTS):
@@ -279,6 +286,6 @@ def csv_hist(ATTEMPTS):
         bins=int(ATTEMPTS / 10),
         title='Histogram of cable lengths, {} attempts'.format(ATTEMPTS))
     plt.xlabel('Total cable length')
-    plt.ylabel("Frequency");
+    plt.ylabel("Frequency")
 
     return
