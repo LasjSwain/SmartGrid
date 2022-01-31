@@ -101,6 +101,6 @@ length_csv(lengths)
 # make a histogram of that csv
 csv_hist(ATTEMPTS)
 
-draw_all_plot()
-# draw_rep_plot()
+# draw_all_plot()
+draw_rep_plot()
 # draw_start_end()
