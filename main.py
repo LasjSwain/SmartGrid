@@ -3,45 +3,54 @@
 # part of Programmeertheorie, Minor Programmeren, UvA
 # main runs all the necessary functions: spine of the program
 
-from lib2to3.pytree import HUGE
+
 import pandas as pd
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-DISTRICT = 2
-NUMBER_HOUSES = 150
-NUMBER_BATTERIES = 5
-
 from classes.house import House
 from classes.battery import Battery
 from classes.cable import Cable
 
+from output import (draw_rep_plot, draw_all_plot,
+                    draw_start_end, find_cable_length)
+from output import make_json, jason_remakes, length_csv, csv_hist
+
+from algorithms.algo_combi import (find_random_combi, find_closest_combi,
+                                   make_dist_list, convert_dist_to_id)
+from algorithms.algo_astar import make_cable
+
+DISTRICT = 2
+NUMBER_HOUSES = 150
+NUMBER_BATTERIES = 5
+
+
 # load in the locations of the houses and batteries as provided
 def load_district(dis_id):
     # read the csv's into dataframes
-    df_bat = pd.read_csv("data/district_{0}/district-{0}_batteries.csv".format(dis_id))
-    df_hou = pd.read_csv("data/district_{0}/district-{0}_houses.csv".format(dis_id))
+    df_bat = pd.read_csv(
+        "data/district_{0}/district-{0}_batteries.csv".format(dis_id))
+    df_hou = pd.read_csv(
+        "data/district_{0}/district-{0}_houses.csv".format(dis_id))
 
     # make objects of each instance in the dataframe
     for idx, bat in df_bat.iterrows():
         # comma separated string -> list of [x, y] ints
         coord_pair = list(map(int, bat['positie'].split(',')))
         battery = Battery(idx, coord_pair[0], coord_pair[1], bat['capaciteit'])
-    
+
     for idx, hou in df_hou.iterrows():
         # comma separated string -> list of [x, y] ints
         coord_pair = [int(hou['x']), int(hou['y'])]
-        house = House(idx, coord_pair[0], coord_pair[1], hou['maxoutput'], 'here will be a cable')
+        house = House(idx, coord_pair[0], coord_pair[1],
+                      hou['maxoutput'], 'here will be a cable')
 
     # creates bitmap for grid to checks for edges
     bitmap = np.pad([[1 for x in range(51)] for y in range(51)], pad_width=1)
 
     return bitmap
-
-from algorithms.algo_combi import find_random_combi, find_closest_combi, make_dist_list, convert_dist_to_id
-from algorithms.algo_astar import make_cable
 
 # THIS WAS FOR RANDOM: LATER DO SOMETHING COOL WITH IT
 # find ... configurations to later calculate shortest length
@@ -107,9 +116,6 @@ while current_attempt < number_options:
 
 print("out of a possible {} options".format(number_options))
 
-from output import draw_rep_plot, draw_all_plot, draw_start_end, find_cable_length
-from output import make_json, jason_remakes, length_csv, csv_hist
-
 min_cable_length = 10**6
 
 # save a list of each length
@@ -122,9 +128,6 @@ for idx, combi_dict in enumerate(configurations):
 
     cablen = find_cable_length()
     lengths.append(cablen)
-
-
-    # print("config {} has len {}".format(idx, cablen))
 
     # find the shortest configuration
     if cablen < min_cable_length:

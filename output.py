@@ -79,14 +79,15 @@ def draw_rep_plot():
 
         # some nice ticks and grid etc
         ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5),
-            ylim=(-5, 55), yticks=np.arange(0, 51, 5))
+               ylim=(-5, 55), yticks=np.arange(0, 51, 5))
         ax.minorticks_on()
         ax.grid(which='both')
 
         # makes grid a nice square to give proper idea of distances
         ax.set_aspect("equal")
 
-        ax.set_title("REP: total shared cable length: {}".format(find_cable_length()))
+        ax.set_title("REP: total shared cable length:\
+                     {}".format(find_cable_length()))
 
         ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
         ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
@@ -103,11 +104,12 @@ def draw_rep_plot():
 def draw_all_plot():
 
     fig, ax = plt.subplots()
-    ax.set_title("ALL: Total shared cable length: {}".format(find_cable_length()))
+    ax.set_title("ALL: Total shared cable length:\
+                 {}".format(find_cable_length()))
 
     # some nice ticks and grid etc
     ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5),
-        ylim=(-5, 55), yticks=np.arange(0, 51, 5))
+           ylim=(-5, 55), yticks=np.arange(0, 51, 5))
     ax.minorticks_on()
     ax.grid(which='both')
     ax.legend()
@@ -156,22 +158,26 @@ def draw_start_end():
 
         # some nice ticks and grid etc
         ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5),
-        ylim=(-5, 55), yticks=np.arange(0, 51, 5))
+               ylim=(-5, 55), yticks=np.arange(0, 51, 5))
         ax.minorticks_on()
         ax.grid(which='both')
 
         # makes grid a nice square to give proper idea of distances
         # ax.set_aspect("equal")
 
-        ax.set_title("REP: total shared cable length: {}".format(find_cable_length()))
+        ax.set_title("REP: total shared cable length:\
+             {}".format(find_cable_length()))
 
         ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
         ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
 
         for idx, cab in enumerate(bat.cables):
-            ax.plot(cab.x_coords, cab.y_coords, c=COLORS[idx], label="line {}".format(idx))
-            ax.scatter(cab.x_coords[0], cab.y_coords[0], c='green', marker='v')
-            ax.scatter(cab.x_coords[-1], cab.y_coords[-1], c='magenta', marker='^')
+            ax.plot(cab.x_coords,
+                    cab.y_coords, c=COLORS[idx], label="line {}".format(idx))
+            ax.scatter(cab.x_coords[0],
+                       cab.y_coords[0], c='green', marker='v')
+            ax.scatter(cab.x_coords[-1],
+                       cab.y_coords[-1], c='magenta', marker='^')
 
         plt.legend()
         plt.show()
@@ -185,7 +191,8 @@ def make_json(DISTRICT):
     battery_price = 5000
     cable_price = 9
     number_batteries = 5
-    costs_shared = number_batteries * battery_price + find_cable_length() * cable_price
+    costs_shared = (number_batteries * battery_price +
+                    find_cable_length() * cable_price)
 
     # create a list that will be outputted to jason, made of dicts
     output = []
@@ -214,7 +221,8 @@ def make_json(DISTRICT):
             cable_list = []
 
             # at each cable segment coordinate as a line to the cable dict
-            # + 1 for number of points inst of len, + 1 for arriving at last point
+            # + 1 for number of points inst of len,
+            # + 1 for arriving at last point
             for cable_idx in range(hou.cable.length):
                 x = hou.cable.x_coords[cable_idx]
                 y = hou.cable.y_coords[cable_idx]
@@ -285,8 +293,9 @@ def csv_hist(number_options):
 
     df = pd.read_csv('output/lengths.csv')
     df.plot(kind='hist',
-        bins=int(number_options / 10),
-        title='Histogram of cable lengths, {} attempts'.format(number_options))
+            bins=int(number_options / 10),
+            title='Histogram of cable lengths, \
+             {} attempts'.format(number_options))
     plt.xlabel('Total cable length')
     plt.ylabel("Frequency")
 

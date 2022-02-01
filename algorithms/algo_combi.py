@@ -4,21 +4,20 @@
 # algo_combi divides houses over batteries without overflowing their capacity
 
 import sys
-import numpy as np
 import random
 
 from classes.house import House
 from classes.battery import Battery
-from classes.cable import Cable
 
 from algorithms.algo_astar import manhattan_distance
+
 
 # randomly find a house-battery configuration that is legal
 def find_random_combi():
 
     # combi dict is the dict in which to save the config
     combi_dict = dict()
-    
+
     # make empty lists for each bat to save houses in later
     for bat in Battery._registry:
         combi_dict[bat] = []
@@ -33,19 +32,20 @@ def find_random_combi():
             random_battery_list = random.sample(Battery._registry, 5)
             for bat_to_cnct in random_battery_list:
 
-                if hou.connected == False:
-                    # if capacity available, connect and lower available capacity
+                if hou.connected is False:
+                    # if capacity available, connect and lower available cap
                     if bat_to_cnct.av_cap >= hou.maxoutput:
                         bat_to_cnct.av_cap -= hou.maxoutput
                         bat_to_cnct.connected_to.append(hou)
                         hou.connected = True
 
-            if hou.connected == False:
+            if hou.connected is False:
                 return False, combi_dict
 
         combi_dict[bat_to_cnct].append(hou)
-        
+
     return True, combi_dict
+
 
 # make a list of the order of all id's of the hous and bats for readability
 def convert_dist_to_id(dist_list):
@@ -63,9 +63,11 @@ def convert_dist_to_id(dist_list):
 
     return id_list
 
+
 # key for sorting the batteries per house
 def key_bats(elem):
     return elem[2]
+
 
 # key for sorting the houses on closest bat
 def key_hous(elem):
@@ -73,12 +75,19 @@ def key_hous(elem):
 
 # find valid hou-bat combination
 # starting with the closest overall distance (1-2-3-4-5) - (1-2-3) + (1-2-3)
-# 1) if unvalid; start with 2nd hou in order (2-3-4-5-1) - (1-2-3) + (1-2-3)
-# 2) if unvalid; start with 2nd hou in order (2-1-3-4-5) - (1-2-3) + (1-2-3) -> (3-1-2-4-5) - (1-2-3) + (1-2-3)
-# 3) if unvalid; start with 2nd bat in order (1-2-3-4-5) - (2-1-3) + (2-1-3)
+# 1) if unvalid; start with 2nd hou in order
+# I.E. (2-3-4-5-1) - (1-2-3) + (1-2-3)
+
+# 2) if unvalid; start with 2nd hou in order
+#  I.E. (2-1-3-4-5) - (1-2-3) + (1-2-3) -> (3-1-2-4-5) - (1-2-3) + (1-2-3)
+
+# 3) if unvalid; start with 2nd bat in order
+# I.E. (1-2-3-4-5) - (2-1-3) + (2-1-3)
 
 # make a (each time shuffled) list of hou-bat combi's sorted on distance
 # NOTE: if we want to go from far->close, add reverse=True in both sorteds
+
+
 def make_dist_list(attempt, switch_what):
     dist_list = []
 
@@ -87,7 +96,8 @@ def make_dist_list(attempt, switch_what):
         for bat in Battery._registry:
             dist = manhattan_distance([hou.x, hou.y], [bat.x, bat.y])
             bat_dist.append([bat.id, bat, dist])
-        dist_list.append([[hou.id, hou], sorted(bat_dist, key=key_bats, reverse=False)])
+        dist_list.append([[hou.id, hou], sorted(
+                    bat_dist, key=key_bats, reverse=False)])
 
     dist_list = sorted(dist_list, key=key_hous, reverse=False)
 
@@ -95,12 +105,13 @@ def make_dist_list(attempt, switch_what):
     if switch_what == 'both':
         for i in range(attempt):
             # every attempt, move a battery to the back
-            dist_list[i % 150][1] = dist_list[i % 150][1][1:] + [dist_list[i % 150][1][0]]
-            
+            dist_list[i % 150][1] = (dist_list[i % 150][1][1:] +
+                                     [dist_list[i % 150][1][0]])
+
             # every 5 attempts, move a house to the back
             if i % 5 == 0 and i != 0:
                 dist_list = dist_list[1:] + [dist_list[0]]
-    
+
     # switch only houses
     elif switch_what == 'only houses':
         for i in range(attempt):
@@ -108,12 +119,14 @@ def make_dist_list(attempt, switch_what):
 
     return dist_list
 
-# for (semi-) ordered list of hou-bat-dist combi's, make possible configurations
+
+# for (semi-) ordered list of hou-bat-dist combi's
+# make possible configurations
 def find_closest_combi(dist_list):
 
     # combi dict is the dict in which to save the config
     combi_dict = dict()
-    
+
     # make empty lists for each bat to save houses in later
     for bat in Battery._registry:
         combi_dict[bat] = []
@@ -126,16 +139,16 @@ def find_closest_combi(dist_list):
             for bat_to_cnct in bats:
                 bat_to_cnct = bat_to_cnct[1]
 
-                if hou.connected == False:
-                    # if capacity available, connect and lower available capacity
+                if hou.connected is False:
+                    # if capacity available, connect and lower available cap
                     if bat_to_cnct.av_cap >= hou.maxoutput:
                         bat_to_cnct.av_cap -= hou.maxoutput
                         bat_to_cnct.connected_to.append(hou)
                         hou.connected = True
 
-            if hou.connected == False:
+            if hou.connected is False:
                 return False, combi_dict
 
         combi_dict[bat_to_cnct].append(hou)
-        
+
     return True, combi_dict

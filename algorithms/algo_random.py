@@ -3,13 +3,13 @@
 # part of Programmeertheorie, Minor Programmeren, UvA
 # algo_random provides a random approach to a solution
 
-import sys
+
 import numpy as np
 import random
 
-from classes.house import House
 from classes.battery import Battery
 from classes.cable import Cable
+
 
 # creates a new cable segment in random direction
 def new_cable_segment():
@@ -23,6 +23,7 @@ def new_cable_segment():
 
     return dx, dy
 
+
 # run a cable from a house to a battery (random)
 def make_cable(sorted_house_objects, bitmap):
 
@@ -34,15 +35,16 @@ def make_cable(sorted_house_objects, bitmap):
         cable_len = 0
 
         # while cable from house hasnt reached battery
-        while hou.connected == False:
+        while hou.connected is False:
 
             # make a random new segment within edges
             dx, dy = new_cable_segment()
 
             # calc coords of new cable point
-            cable_point = [cable_instance[cable_len][0] + dx, cable_instance[cable_len][1] + dy]
+            cable_point = [cable_instance[cable_len][0] + dx,
+                           cable_instance[cable_len][1] + dy]
 
-            # checks on bitmap if the coordinate is valid (not outside of edges)
+            # checks on bitmap if the coordinate is valid (inside edges)
             if bitmap[cable_point[0]+1][cable_point[1]+1] == 1:
 
                 # checks if cable reached an available battery
@@ -74,8 +76,8 @@ def make_cable(sorted_house_objects, bitmap):
         cable_instance = (np.array(cable_instance)).T
 
         cable = Cable(cable_instance[0], cable_instance[1], cable_len)
-        
+
         hou.cable = cable
         bat.cables.append(cable)
-        
+
     return True
