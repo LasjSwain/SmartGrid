@@ -62,8 +62,7 @@ def make_cable(combi_dict, bitmap):
                     for idx in range(len(cable.x_coords)):
                         cab_point = [cable.x_coords[idx], cable.y_coords[idx]]
                         # checks if closer than previous closest point
-                        if manhattan_distance(([hou.x, hou.y], cab_point) <
-                                              min_distance):
+                        if manhattan_distance([hou.x, hou.y], cab_point) <min_distance:
                             min_distance = manhattan_distance(
                                 [hou.x, hou.y], cab_point)
 
@@ -94,8 +93,7 @@ def make_cable(combi_dict, bitmap):
 
                     # only move if getting closer to connectpoint,
                     # else try another move
-                    if manhattan_distance((cable_point, closest_connectpoint) <
-                                          distance_to_cnctpoint):
+                    if manhattan_distance(cable_point, closest_connectpoint) <distance_to_cnctpoint:
 
                         cable_instance.append(cable_point)
                         cable_len += 1

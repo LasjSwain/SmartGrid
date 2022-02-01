@@ -86,8 +86,7 @@ def draw_rep_plot():
         # makes grid a nice square to give proper idea of distances
         ax.set_aspect("equal")
 
-        ax.set_title("REP: total shared cable length:\
-                     {}".format(find_cable_length()))
+        ax.set_title("REP: total shared cable length:{}".format(find_cable_length()))
 
         ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
         ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
@@ -104,8 +103,7 @@ def draw_rep_plot():
 def draw_all_plot():
 
     fig, ax = plt.subplots()
-    ax.set_title("ALL: Total shared cable length:\
-                 {}".format(find_cable_length()))
+    ax.set_title("ALL: Total shared cable length:{}".format(find_cable_length()))
 
     # some nice ticks and grid etc
     ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5),
@@ -165,8 +163,7 @@ def draw_start_end():
         # makes grid a nice square to give proper idea of distances
         # ax.set_aspect("equal")
 
-        ax.set_title("REP: total shared cable length:\
-             {}".format(find_cable_length()))
+        ax.set_title("REP: total shared cable length:{}".format(find_cable_length()))
 
         ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
         ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
