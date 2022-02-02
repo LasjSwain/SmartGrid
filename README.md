@@ -26,7 +26,7 @@ hierop valt te lezen onder het kopje 'Experiment'
 
 Voor elk van deze 3 districten met elk 3 opties worden 2 figuren opgeslagen: een visuele
 representatie van de oplossing met de kortste totale kabellengte, en een histogram van de
-verdeling van de totale kabellengte van elk van de geldige configuraties.
+verdeling van de totale kabellengte van elk van de geldige configuraties. 
 
 ## Experiment
 
@@ -39,3 +39,13 @@ De eerste optie naast de baseline is het bepalen van de volgorde van huizen verb
 
 De tweede optie is een uitbreiding van de eerste. Hierbij wordt niet alleen de volgorde van de huizen aangepast, maar ook die van de batterijen. Ter illustratie nemen we de eerste geprobeerde volgorde uit optie 1. Hier wordt gestart met het huis met de kortste afstand tot de dichtstbijzijnde batterij, etc, maar ieder van deze huizen probeert altijd eerst aan zijn dichtstbijzijnde batterij te verbinden. In deze tweede optie worden ook de andere volgordes (batterij 2 - 3- 4- 5 - 1, bijvoorbeeld) geprobeerd. Dit geeft in totaal 750 mogelijk geldige configuraties. Zie hieronder de resultaten. 
 Uit deze resultaten valt af te leiden dat het toevoegen van configuraties waarbij niet éérst wordt geprobeerd te verbinden aan de dichtstbijzijnde batterij, geen kortere oplossing geven. Dit is de reden dat wij andere volgordes niet hebben onderzocht, zoals volgordes als  bijvoorbeeld 3-1-4-2-5, waarbij de nummers niet opeenvolgend hoeven te zijn.
+
+## Check50
+
+Deze opdracht wordt normaal gesproken automatisch gecontroleerd met check50. Helaas komt onze oplossing hier niet doorheen; ons programma telt
+de gedeelde kabels op een andere manier dan dat check50 dat doet. Dit is een definitie-kwestie die in de opdracht niet wordt gespecificeerd:
+worden niet-gedeelde kabels op het zelfde gridsegment enkel of dubbel meegeteld? Dit lijkt zo in het voorbeeld output.json bestand en uit de
+code in het check50-bestand. Na overleg met vakassistentie is besloten dit verder niet te veranderen: onze methode werkt, aan de hand van onze 
+definities. Het belangrijkste verschil is dat kabels die over hetzelfde stuk grid lopen, maar niet gedeeld zijn omdat ze naar verschillende 
+batterijen lopen, ook niet als gedeeld worden geteld. Aangezien het voornamelijk gaat om de vergelijking tussen de resultaten, is dit verder
+ook niet van cruciaal belang. 
