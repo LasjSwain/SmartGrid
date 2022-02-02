@@ -170,10 +170,16 @@ def run_all():
     # draw_rep_plot doesnt work perfectly; not necessary for results anyway
     # draw_rep_plot(DISTRICT, CONFIG, SWITCH)
 
+    # delete all object instances after an approach
+    House._registry = []
+    Battery._registry = []
+    Cable._registry = []
+
     return
 
+# RUN ALL CODE FOR ALL OPTIONS
 for DISTRICT in [1, 2, 3]:
     print("START district: {}".format(DISTRICT))
     for CONFIG, SWITCH, number_options in config_switch_settings:
-        print("START: {} -- {} \n".format(CONFIG, SWITCH))
+        print("{} -- {} \n".format(CONFIG, SWITCH))
         run_all()

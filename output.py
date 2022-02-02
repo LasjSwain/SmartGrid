@@ -12,8 +12,6 @@ from classes.house import House
 from classes.battery import Battery
 from classes.cable import Cable
 
-PLOT_PATH = r"C:\Users\lars1\Documents\Programmeren\SmartGrid_docs\plots"
-
 # find the total cable length of a certain house-battery configuration
 def find_cable_length():
 
@@ -58,9 +56,7 @@ def draw_all_plot(DISTRICT, CONFIG, SWITCH):
         ax.plot(cab.x_coords, cab.y_coords, c='green')
 
     ax.legend()
-    plt.savefig('{}/{}_all_{}_{}.png'.format(PLOT_PATH, DISTRICT, CONFIG, SWITCH))
-    plt.close()
-    # plt.show()
+    plt.savefig('output/plots/{}_all_{}_{}.png'.format(DISTRICT, CONFIG, SWITCH))
 
     return
 
@@ -102,8 +98,7 @@ def draw_rep_plot(DISTRICT, CONFIG, SWITCH):
             ax.plot(cab.x_coords, cab.y_coords, c='green')
 
         ax.legend()
-        # plt.savefig('{}/{}_rep{}_{}_{}.png'.format(PLOT_PATH, DISTRICT, batnet, CONFIG, SWITCH))
-        # plt.show()
+        plt.savefig('output/plots/{}_rep{}_{}_{}.png'.format(DISTRICT, batnet, CONFIG, SWITCH))
 
     return
 
@@ -219,8 +214,6 @@ def csv_hist(DISTRICT, CONFIG, SWITCH, number_options):
                 ' attempts: {}'.format(DISTRICT, number_options))
     plt.xlabel('Total cable length')
     plt.ylabel("Frequency")
-    plt.savefig('{}/{}_hist_{}_{}.png'.format(PLOT_PATH, DISTRICT, CONFIG, SWITCH))
-    plt.close()
-    # plt.show()
+    plt.savefig('output/plots/{}_hist_{}_{}.png'.format(DISTRICT, CONFIG, SWITCH))
 
     return
