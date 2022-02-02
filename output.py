@@ -285,7 +285,6 @@ def length_csv(lengths):
 
     return
 
-
 # make a histogram of all total cable lengths from the saved csv
 def csv_hist(number_options):
 

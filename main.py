@@ -157,13 +157,13 @@ lengths = connect_grid()
 # save lengths of all options in a csv
 length_csv(lengths)
 
+# make a histogram of that csv
+# csv_hist(number_options)
+
 # for the shortest option, remake all objects from the saved json
 jason_remakes()
 
-# make a histogram of that csv
-csv_hist(number_options)
-
 # plot the best result
-# draw_all_plot()
-draw_rep_plot()
+draw_all_plot()
+# draw_rep_plot()
 # draw_start_end()
