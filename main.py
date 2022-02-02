@@ -3,6 +3,7 @@
 # part of Programmeertheorie, Minor Programmeren, UvA
 # main runs all the necessary functions: spine of the program
 
+from multiprocessing import cpu_count
 import pandas as pd
 import numpy as np
 
@@ -10,37 +11,32 @@ from classes.house import House
 from classes.battery import Battery
 from classes.cable import Cable
 
-from output import (draw_rep_plot, draw_all_plot,
-                    draw_start_end, find_cable_length)
+from output import draw_rep_plot, draw_all_plot, find_cable_length
 from output import make_json, jason_remakes, length_csv, csv_hist
 
 from algorithms.algo_combi import (find_random_combi, find_closest_combi,
                                    make_dist_list, convert_dist_to_id)
 from algorithms.algo_astar import make_cable
 
-DISTRICT = 2
 NUMBER_HOUSES = 150
 NUMBER_BATTERIES = 5
 
-# CONFIG can either be 'random' or 'closest'
-CONFIG = 'closest'
-
-# do you want to switch houses or batteries?
-# SWITCH can be 'only houses' or 'both'
-SWITCH = 'only houses'
-
-if SWITCH == 'only houses':
-    number_options = NUMBER_HOUSES
-elif SWITCH == 'both':
-    number_options = NUMBER_HOUSES * NUMBER_BATTERIES
+# these are the 3 possible combinations of settings
+# 1) house-battery combi is random, searching within 150 random configurations
+# 2) hou-bat combi is ordered close->far, switching houses only (150 options)
+# 3) hou-bat combi is ordered close->far, switching houses&batteries (750 options)
+# see README.md for more extensive explanation
+config_switch_settings = [['random', '', 150],
+                          ['closest', 'only houses', NUMBER_HOUSES],
+                          ['closest', 'both', NUMBER_HOUSES * NUMBER_BATTERIES]]
 
 # load in the locations of the houses and batteries as provided
-def load_district(dis_id):
+def load_district(DISTRICT):
     # read the csv's into dataframes
     df_bat = pd.read_csv(
-        "data/district_{0}/district-{0}_batteries.csv".format(dis_id))
+        "data/district_{0}/district-{0}_batteries.csv".format(DISTRICT))
     df_hou = pd.read_csv(
-        "data/district_{0}/district-{0}_houses.csv".format(dis_id))
+        "data/district_{0}/district-{0}_houses.csv".format(DISTRICT))
 
     # make objects of each instance in the dataframe
     for idx, bat in df_bat.iterrows():
@@ -80,8 +76,8 @@ def make_configurations():
 
             configurations.append(combi_dict)
 
-            if len(configurations) % 10 == 0:
-                print("We got {} configs".format(len(configurations)))
+        print("Found {} configurations".format(len(configurations)))
+        print("\n")
 
     elif CONFIG == 'closest':
 
@@ -107,19 +103,22 @@ def make_configurations():
 
                 current_attempt += 1
 
+                # make sure the search stops after number_option attempts,
+                # even if no legal solutions are found
+                if current_attempt == number_options:
+                    legal_solution = True
+
             if id_list not in orders:
                 configurations.append(combi_dict)
                 orders.append(id_list)
 
-                if len(configurations) % 1 == 0:
-                    print("We got {} configs".format(len(configurations)))
-
-    print("Out of a possible {} options".format(number_options))
+        print("Found {} configurations".format(len(configurations)))
+        print("Out of a possible {} options\n".format(number_options))
 
     return bitmap, configurations
 
 # for each config, pull cables, find length, save the shortest
-def connect_grid():
+def connect_grid(bitmap, configurations):
 
     min_cable_length = 10**6
 
@@ -148,22 +147,33 @@ def connect_grid():
         
     return lengths
 
-# find house-battery configurations to later calculate shortest length
-bitmap, configurations = make_configurations()
+def run_all():
 
-# for each config, pull cables, find length, save the shortest in json
-lengths = connect_grid()
+    # find house-battery configurations to later calculate shortest length
+    bitmap, configurations = make_configurations()
 
-# save lengths of all options in a csv
-length_csv(lengths)
+    # for each config, pull cables, find length, save the shortest in json
+    lengths = connect_grid(bitmap, configurations)
 
-# make a histogram of that csv
-# csv_hist(number_options)
+    # save lengths of all options in a csv
+    length_csv(lengths)
 
-# for the shortest option, remake all objects from the saved json
-jason_remakes()
+    # make a histogram of that csv
+    csv_hist(DISTRICT, CONFIG, SWITCH, number_options)
 
-# plot the best result
-draw_all_plot()
-# draw_rep_plot()
-# draw_start_end()
+    # for the shortest option, remake all objects from the saved json
+    jason_remakes()
+
+    # plot the best result
+    draw_all_plot(DISTRICT, CONFIG, SWITCH)
+
+    # draw_rep_plot doesnt work perfectly; not necessary for results anyway
+    # draw_rep_plot(DISTRICT, CONFIG, SWITCH)
+
+    return
+
+for DISTRICT in [1, 2, 3]:
+    print("START district: {}".format(DISTRICT))
+    for CONFIG, SWITCH, number_options in config_switch_settings:
+        print("START: {} -- {} \n".format(CONFIG, SWITCH))
+        run_all()

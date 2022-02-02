@@ -3,8 +3,6 @@
 # part of Programmeertheorie, Minor Programmeren, UvA
 # output draws a visual representation and produces a .json
 
-import sys
-
 import matplotlib.pyplot as plt
 import numpy as np
 import json
@@ -14,43 +12,7 @@ from classes.house import House
 from classes.battery import Battery
 from classes.cable import Cable
 
-# some colors used in draw_start_end()
-COLORS = [
-    "black",
-    "gray",
-    "silver",
-    "lightcoral",
-    "maroon",
-    "red",
-    "sienna",
-    "darkorange",
-    "navajowhite",
-    "darkgoldenrod",
-    "yellow",
-    "olive",
-    "yellowgreen",
-    "chartreuse",
-    "darkseagreen",
-    "limegreen",
-    "lime",
-    "aquamarine",
-    "lightseagreen",
-    "aqua",
-    "deepskyblue",
-    "steelblue",
-    "navy",
-    "slateblue",
-    "blueviolet",
-    "indigo",
-    "darkviolet",
-    "fuchsia",
-    "deeppink",
-    "cadetblue",
-    "crimson",
-    "black",
-    "black",
-    "black"
-]
+PLOT_PATH = r"C:\Users\lars1\Documents\Programmeren\SmartGrid_docs\plots"
 
 # find the total cable length of a certain house-battery configuration
 def find_cable_length():
@@ -63,17 +25,16 @@ def find_cable_length():
     return cable_length
 
 # draw a visualisation of the grid, all battery networks in 1 plot
-def draw_all_plot():
+def draw_all_plot(DISTRICT, CONFIG, SWITCH):
 
     fig, ax = plt.subplots()
-    ax.set_title("Total shared cable length:{}".format(find_cable_length()))
+    ax.set_title("District: {}, Total shared cable length:{}".format(DISTRICT, find_cable_length()))
 
     # some nice ticks and grid etc
     ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5),
            ylim=(-5, 55), yticks=np.arange(0, 51, 5))
     ax.minorticks_on()
     ax.grid(which='both')
-    ax.legend()
 
     # makes grid a nice square to give proper idea of distances
     ax.set_aspect("equal")
@@ -96,12 +57,15 @@ def draw_all_plot():
     for cab in Cable._registry:
         ax.plot(cab.x_coords, cab.y_coords, c='green')
 
-    plt.show()
+    ax.legend()
+    plt.savefig('{}/{}_all_{}_{}.png'.format(PLOT_PATH, DISTRICT, CONFIG, SWITCH))
+    plt.close()
+    # plt.show()
 
     return
 
 # draw a visualisation of the grid, repeated for each battery network
-def draw_rep_plot():
+def draw_rep_plot(DISTRICT, CONFIG, SWITCH):
 
     bat_coords = [[], []]
     for bat in Battery._registry:
@@ -114,7 +78,9 @@ def draw_rep_plot():
         hou_coords[1].append(hou.y)
 
     # gather coords of all object instances and format in scatterable way
+    batnet = 0
     for bat in Battery._registry:
+        batnet += 1
         fig, ax = plt.subplots()
 
         # some nice ticks and grid etc
@@ -126,62 +92,20 @@ def draw_rep_plot():
         # makes grid a nice square to give proper idea of distances
         ax.set_aspect("equal")
 
-        ax.set_title("Total shared cable length:{}".format(find_cable_length()))
+        ax.set_title("District: {}, Total shared cable length:{}".format(DISTRICT, find_cable_length()))
 
         ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
         ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
 
+        # this doesnt work anymore as bat has wrong cables somehow
         for cab in bat.cables:
             ax.plot(cab.x_coords, cab.y_coords, c='green')
 
-        plt.show()
+        ax.legend()
+        # plt.savefig('{}/{}_rep{}_{}_{}.png'.format(PLOT_PATH, DISTRICT, batnet, CONFIG, SWITCH))
+        # plt.show()
 
     return
-
-# make a plot like rep_plot, but then with start and end points of cables specified
-def draw_start_end():
-
-    bat_coords = [[], []]
-    for bat in Battery._registry:
-        bat_coords[0].append(bat.x)
-        bat_coords[1].append(bat.y)
-
-    hou_coords = [[], []]
-    for hou in House._registry:
-        hou_coords[0].append(hou.x)
-        hou_coords[1].append(hou.y)
-
-    # gather coords of all object instances and format in scatterable way
-    for bat in Battery._registry:
-        fig, ax = plt.subplots()
-
-        # some nice ticks and grid etc
-        ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5),
-               ylim=(-5, 55), yticks=np.arange(0, 51, 5))
-        ax.minorticks_on()
-        ax.grid(which='both')
-
-        # makes grid a nice square to give proper idea of distances
-        ax.set_aspect("equal")
-
-        ax.set_title("Total shared cable length:{}".format(find_cable_length()))
-
-        ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
-        ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
-
-        for idx, cab in enumerate(bat.cables):
-            ax.plot(cab.x_coords,
-                    cab.y_coords, c=COLORS[idx], label="line {}".format(idx))
-            ax.scatter(cab.x_coords[0],
-                       cab.y_coords[0], c='green', marker='v')
-            ax.scatter(cab.x_coords[-1],
-                       cab.y_coords[-1], c='magenta', marker='^')
-
-        plt.legend()
-        plt.show()
-
-    return
-
 
 # output a json file in the specified format to use check50
 def make_json(DISTRICT):
@@ -286,14 +210,17 @@ def length_csv(lengths):
     return
 
 # make a histogram of all total cable lengths from the saved csv
-def csv_hist(number_options):
+def csv_hist(DISTRICT, CONFIG, SWITCH, number_options):
 
     df = pd.read_csv('output/lengths.csv')
     df.plot(kind='hist',
             bins=int(number_options / 10),
-            title='Histogram of cable lengths, \
-             {} attempts'.format(number_options))
+            title='Histogram of cable lengths of district: {},'
+                ' attempts: {}'.format(DISTRICT, number_options))
     plt.xlabel('Total cable length')
     plt.ylabel("Frequency")
+    plt.savefig('{}/{}_hist_{}_{}.png'.format(PLOT_PATH, DISTRICT, CONFIG, SWITCH))
+    plt.close()
+    # plt.show()
 
     return

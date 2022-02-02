@@ -88,7 +88,7 @@ def make_cable(combi_dict, bitmap):
 
                     # only move if getting closer to connectpoint,
                     # else try another move
-                    if manhattan_distance(cable_point, closest_connectpoint) <distance_to_cnctpoint:
+                    if manhattan_distance(cable_point, closest_connectpoint) < distance_to_cnctpoint:
 
                         cable_instance.append(cable_point)
                         cable_len += 1
@@ -103,8 +103,8 @@ def make_cable(combi_dict, bitmap):
             # transpose the cable list from ([xy][xy]) to ([xxx][yyy])
             cable_instance = (np.array(cable_instance)).T
 
-            cable = Cable(cable_instance[0],
-                          cable_instance[1], len(cable_instance[0]))
+            cable = Cable(cable_instance[0], cable_instance[1],
+                          len(cable_instance[0]))
 
             hou.cable = cable
             bat.cables.append(cable)
