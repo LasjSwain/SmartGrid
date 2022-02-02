@@ -12,7 +12,7 @@ optimale oplossing, waarbij optimaal bestaat uit het verkrijgen van een oplossin
 totale kabellengte. Hierbij mogen huizen die aan dezelfde batterij verbonden zijn kabels delen.
 
 De beste door ons gevonden oplossing is de volgende:
-<img src="output/plots/x.png" width="500" heigth="500" alt="SmartGrid - optimale oplossing">
+<img src="output/plots/3_all_closest_only houses.png" width="500" heigth="500" alt="SmartGrid - optimale oplossing">
 
 ## Gebruik
 
