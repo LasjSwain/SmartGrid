@@ -3,7 +3,6 @@
 # part of Programmeertheorie, Minor Programmeren, UvA
 # algo_combi divides houses over batteries without overflowing their capacity
 
-import sys
 import random
 
 from classes.house import House
@@ -26,8 +25,6 @@ def find_random_combi():
     for hou in random_house_list:
 
         while not hou.connected:
-            # later implement some kind of actual algorithm here
-            # bat_to_cnct = random.choice(Battery._registry)
 
             random_battery_list = random.sample(Battery._registry, 5)
             for bat_to_cnct in random_battery_list:
@@ -73,21 +70,9 @@ def key_bats(elem):
 def key_hous(elem):
     return elem[1][0][2]
 
-# find valid hou-bat combination
-# starting with the closest overall distance (1-2-3-4-5) - (1-2-3) + (1-2-3)
-# 1) if unvalid; start with 2nd hou in order
-# I.E. (2-3-4-5-1) - (1-2-3) + (1-2-3)
-
-# 2) if unvalid; start with 2nd hou in order
-#  I.E. (2-1-3-4-5) - (1-2-3) + (1-2-3) -> (3-1-2-4-5) - (1-2-3) + (1-2-3)
-
-# 3) if unvalid; start with 2nd bat in order
-# I.E. (1-2-3-4-5) - (2-1-3) + (2-1-3)
 
 # make a (each time shuffled) list of hou-bat combi's sorted on distance
 # NOTE: if we want to go from far->close, add reverse=True in both sorteds
-
-
 def make_dist_list(attempt, switch_what):
     dist_list = []
 

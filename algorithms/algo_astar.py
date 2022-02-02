@@ -4,7 +4,6 @@
 # algo_astar provides an approach to a solution
 # via the A* algorithm for pathfinding
 
-import sys
 import numpy as np
 import random
 
@@ -39,9 +38,6 @@ def make_cable(combi_dict, bitmap):
 
         for hou in bat.connected_to:
 
-            # number of cable points on battery; not counted in cable_leng
-            # bat_connectpoints = 0
-
             # set all houses to not connected to re-use variable
             hou.connected = False
 
@@ -51,7 +47,6 @@ def make_cable(combi_dict, bitmap):
             # if bat has no cables, closest connectable point = bat self
             if len(bat.cables) == 0:
                 closest_connectpoint = [bat.x, bat.y]
-                # bat_connectpoints += 1
 
             # else find closest cable connected to that battery
             else:
@@ -104,14 +99,8 @@ def make_cable(combi_dict, bitmap):
                         if (cable_point[0] == closest_connectpoint[0] and
                                 cable_point[1] == closest_connectpoint[1]):
                             hou.connected = True
-                # else: try again
 
             # transpose the cable list from ([xy][xy]) to ([xxx][yyy])
-            # print("hou: ", hou.x, hou.y)
-            # print("cab: ", cable_instance)
-            # print("bat: ", bat.x, bat.y)
-            # print("cnct: ", closest_connectpoint)
-
             cable_instance = (np.array(cable_instance)).T
 
             cable = Cable(cable_instance[0],

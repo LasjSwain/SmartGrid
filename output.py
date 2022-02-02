@@ -3,6 +3,8 @@
 # part of Programmeertheorie, Minor Programmeren, UvA
 # output draws a visual representation and produces a .json
 
+import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
 import json
@@ -12,6 +14,7 @@ from classes.house import House
 from classes.battery import Battery
 from classes.cable import Cable
 
+# some colors used in draw_start_end()
 COLORS = [
     "black",
     "gray",
@@ -49,7 +52,7 @@ COLORS = [
     "black"
 ]
 
-
+# find the total cable length of a certain house-battery configuration
 def find_cable_length():
 
     cable_length = 0
@@ -59,51 +62,11 @@ def find_cable_length():
 
     return cable_length
 
-
-# draw a visualisation of the grid, repeated for each battery network
-def draw_rep_plot():
-
-    bat_coords = [[], []]
-    for bat in Battery._registry:
-        bat_coords[0].append(bat.x)
-        bat_coords[1].append(bat.y)
-
-    hou_coords = [[], []]
-    for hou in House._registry:
-        hou_coords[0].append(hou.x)
-        hou_coords[1].append(hou.y)
-
-    # gather coords of all object instances and format in scatterable way
-    for bat in Battery._registry:
-        fig, ax = plt.subplots()
-
-        # some nice ticks and grid etc
-        ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5),
-               ylim=(-5, 55), yticks=np.arange(0, 51, 5))
-        ax.minorticks_on()
-        ax.grid(which='both')
-
-        # makes grid a nice square to give proper idea of distances
-        ax.set_aspect("equal")
-
-        ax.set_title("REP: total shared cable length:{}".format(find_cable_length()))
-
-        ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
-        ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
-
-        for cab in bat.cables:
-            ax.plot(cab.x_coords, cab.y_coords, c='green')
-
-        plt.show()
-
-    return
-
-
 # draw a visualisation of the grid, all battery networks in 1 plot
 def draw_all_plot():
 
     fig, ax = plt.subplots()
-    ax.set_title("ALL: Total shared cable length:{}".format(find_cable_length()))
+    ax.set_title("Total shared cable length:{}".format(find_cable_length()))
 
     # some nice ticks and grid etc
     ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5),
@@ -137,7 +100,45 @@ def draw_all_plot():
 
     return
 
+# draw a visualisation of the grid, repeated for each battery network
+def draw_rep_plot():
 
+    bat_coords = [[], []]
+    for bat in Battery._registry:
+        bat_coords[0].append(bat.x)
+        bat_coords[1].append(bat.y)
+
+    hou_coords = [[], []]
+    for hou in House._registry:
+        hou_coords[0].append(hou.x)
+        hou_coords[1].append(hou.y)
+
+    # gather coords of all object instances and format in scatterable way
+    for bat in Battery._registry:
+        fig, ax = plt.subplots()
+
+        # some nice ticks and grid etc
+        ax.set(xlim=(-5, 55), xticks=np.arange(0, 51, 5),
+               ylim=(-5, 55), yticks=np.arange(0, 51, 5))
+        ax.minorticks_on()
+        ax.grid(which='both')
+
+        # makes grid a nice square to give proper idea of distances
+        ax.set_aspect("equal")
+
+        ax.set_title("Total shared cable length:{}".format(find_cable_length()))
+
+        ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
+        ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
+
+        for cab in bat.cables:
+            ax.plot(cab.x_coords, cab.y_coords, c='green')
+
+        plt.show()
+
+    return
+
+# make a plot like rep_plot, but then with start and end points of cables specified
 def draw_start_end():
 
     bat_coords = [[], []]
@@ -161,9 +162,9 @@ def draw_start_end():
         ax.grid(which='both')
 
         # makes grid a nice square to give proper idea of distances
-        # ax.set_aspect("equal")
+        ax.set_aspect("equal")
 
-        ax.set_title("REP: total shared cable length:{}".format(find_cable_length()))
+        ax.set_title("Total shared cable length:{}".format(find_cable_length()))
 
         ax.scatter(bat_coords[0], bat_coords[1], c='red', label="batteries")
         ax.scatter(hou_coords[0], hou_coords[1], c='blue', label="houses")
@@ -218,8 +219,6 @@ def make_json(DISTRICT):
             cable_list = []
 
             # at each cable segment coordinate as a line to the cable dict
-            # + 1 for number of points inst of len,
-            # + 1 for arriving at last point
             for cable_idx in range(hou.cable.length):
                 x = hou.cable.x_coords[cable_idx]
                 y = hou.cable.y_coords[cable_idx]
@@ -235,7 +234,6 @@ def make_json(DISTRICT):
         json.dump(output, fp)
 
     return
-
 
 # recreate all house, battery and cable objects from the best saved json
 def jason_remakes():
@@ -272,6 +270,9 @@ def jason_remakes():
 
             # note: dont add actual id here but guess we dont need it here anymore
             house = House(0, x, y, maxoutput, cable)
+
+            battery.connected_to.append(house)
+            battery.cables.append(cable)
 
     return
 

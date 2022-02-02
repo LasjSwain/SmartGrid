@@ -3,12 +3,8 @@
 # part of Programmeertheorie, Minor Programmeren, UvA
 # main runs all the necessary functions: spine of the program
 
-
 import pandas as pd
-import sys
-import matplotlib.pyplot as plt
 import numpy as np
-import random
 
 from classes.house import House
 from classes.battery import Battery
@@ -26,6 +22,17 @@ DISTRICT = 2
 NUMBER_HOUSES = 150
 NUMBER_BATTERIES = 5
 
+# CONFIG can either be 'random' or 'closest'
+CONFIG = 'closest'
+
+# do you want to switch houses or batteries?
+# SWITCH can be 'only houses' or 'both'
+SWITCH = 'only houses'
+
+if SWITCH == 'only houses':
+    number_options = NUMBER_HOUSES
+elif SWITCH == 'both':
+    number_options = NUMBER_HOUSES * NUMBER_BATTERIES
 
 # load in the locations of the houses and batteries as provided
 def load_district(dis_id):
@@ -52,104 +59,111 @@ def load_district(dis_id):
 
     return bitmap
 
-# THIS WAS FOR RANDOM: LATER DO SOMETHING COOL WITH IT
-# find ... configurations to later calculate shortest length
-# configurations = []
-# while len(configurations) < ATTEMPTS:
+# find house-battery configurations to later calculate shortest length
+def make_configurations():
 
-#     legal_solution = False
-#     while not legal_solution:
-#         Battery._registry = []
-#         House._registry = []
+    configurations = []
 
-#         # load in all houses, batteries and borders
-#         bitmap = load_district(DISTRICT)
+    if CONFIG == 'random':
+        while len(configurations) < number_options:
 
-#         # find a house-battery configuration
-#         legal_solution, combi_dict = find_random_combi()
+            legal_solution = False
+            while not legal_solution:
+                Battery._registry = []
+                House._registry = []
 
-#     configurations.append(combi_dict)
+                # load in all houses, batteries and borders
+                bitmap = load_district(DISTRICT)
 
-#     if len(configurations) % 10 == 0:
-#         print("We got {} configs".format(len(configurations)))
+                # find a house-battery configuration
+                legal_solution, combi_dict = find_random_combi()
 
-# do you want to switch houses or batteries?
-switch_what = 'only houses'
-# switch_what = 'both'
+            configurations.append(combi_dict)
 
-if switch_what == 'only houses':
-    number_options = NUMBER_HOUSES
-elif switch_what == 'both':
-    number_options = NUMBER_HOUSES * NUMBER_BATTERIES
+            if len(configurations) % 10 == 0:
+                print("We got {} configs".format(len(configurations)))
 
-# find ... configurations to later calculate shortest length
-configurations = []
-orders = []
-current_attempt = 0
+    elif CONFIG == 'closest':
 
-while current_attempt < number_options:
+        orders = []
+        current_attempt = 0
 
-    legal_solution = False
-    while not legal_solution:
-        Battery._registry = []
-        House._registry = []
+        while current_attempt < number_options:
 
-        # load in all houses, batteries and borders
-        bitmap = load_district(DISTRICT)
+            legal_solution = False
+            while not legal_solution:
+                Battery._registry = []
+                House._registry = []
 
-        # make a (shuffled based on current_attempt) new possible config order
-        dist_list = make_dist_list(current_attempt, switch_what)
-        id_list = convert_dist_to_id(dist_list)
+                # load in all houses, batteries and borders
+                bitmap = load_district(DISTRICT)
 
-        # find a house-battery configuration
-        legal_solution, combi_dict = find_closest_combi(dist_list)
+                # make a (shuffled based on current_attempt) new possible config order
+                dist_list = make_dist_list(current_attempt, SWITCH)
+                id_list = convert_dist_to_id(dist_list)
 
-        current_attempt += 1
-        print(current_attempt)
+                # find a house-battery configuration
+                legal_solution, combi_dict = find_closest_combi(dist_list)
 
-    if id_list not in orders:
-        configurations.append(combi_dict)
-        orders.append(id_list)
+                current_attempt += 1
 
-        if len(configurations) % 1 == 0:
-            print("We got {} configs".format(len(configurations)))
+            if id_list not in orders:
+                configurations.append(combi_dict)
+                orders.append(id_list)
 
-print("out of a possible {} options".format(number_options))
+                if len(configurations) % 1 == 0:
+                    print("We got {} configs".format(len(configurations)))
 
-min_cable_length = 10**6
+    print("Out of a possible {} options".format(number_options))
 
-# save a list of each length
-lengths = []
+    return bitmap, configurations
 
 # for each config, pull cables, find length, save the shortest
-for idx, combi_dict in enumerate(configurations):
+def connect_grid():
 
-    make_cable(combi_dict, bitmap)
+    min_cable_length = 10**6
 
-    cablen = find_cable_length()
-    lengths.append(cablen)
+    # save a list of each length
+    lengths = []
 
-    # find the shortest configuration
-    if cablen < min_cable_length:
-        min_cable_length = cablen
-        make_json(DISTRICT)
+    # for each config, pull cables, find length, save the shortest
+    for idx, combi_dict in enumerate(configurations):
 
-    # reset variables related to cables
-    Cable._registry = []
-    for bat in Battery._registry:
-        bat.cables = []
-    for hou in House._registry:
-        hou.cable = "emptied"
+        make_cable(combi_dict, bitmap)
 
-# remake from json:
-jason_remakes()
+        cablen = find_cable_length()
+        lengths.append(cablen)
 
-# save all lengths in a csv
+        # find the shortest configuration
+        if cablen < min_cable_length:
+            min_cable_length = cablen
+            make_json(DISTRICT)
+
+        # reset variables related to cables
+        Cable._registry = []
+        for bat in Battery._registry:
+            bat.cables = []
+        for hou in House._registry:
+            hou.cable = "emptied"
+        
+    return lengths
+
+# find house-battery configurations to later calculate shortest length
+bitmap, configurations = make_configurations()
+
+# for each config, pull cables, find length, save the shortest in json
+lengths = connect_grid()
+
+# save lengths of all options in a csv
 length_csv(lengths)
+
+# for the shortest option, remake all objects from the saved json
+jason_remakes()
 
 # make a histogram of that csv
 csv_hist(number_options)
 
-draw_all_plot()
-# draw_rep_plot()
+# plot the best result
+# draw_all_plot()
+draw_rep_plot()
 # draw_start_end()
